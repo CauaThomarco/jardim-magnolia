@@ -1,11 +1,12 @@
 package com.jardimmagnolia.controller;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Map;
 
+@CrossOrigin(origins = "*") 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -13,33 +14,15 @@ public class AuthController {
     @Value("${app.admin.code}")
     private String adminCode;
 
-    // POST /api/auth/admin  — Body: { "code": "JARDIM@2026" }
-    @PostMapping("/admin")
-    public ResponseEntity<?> adminLogin(@RequestBody Map<String, String> body) {
-        String code = body.getOrDefault("code", "");
-
-        if (!code.equals(adminCode)) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("ok", false, "message", "Código de acesso inválido."));
-        }
-
-        return ResponseEntity.ok(Map.of(
-                "ok",      true,
-                "message", "Autenticado com sucesso."
-        ));
-    }
-
-    // POST /api/auth/login  — Body: { "email": "...", "password": "..." }
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
-        // TODO: integrar com tabela de usuários / JWT
-        String email = body.getOrDefault("email", "");
-
-        return ResponseEntity.ok(Map.of(
-                "ok",      true,
-                "message", "Login realizado. (JWT em breve)",
-                "email",   email
-        ));
+    public ResponseEntity<?> login(@RequestBody Map<String, String> payload) {
+        String code = payload.get("code"); 
+        
+        // Verifica se a senha existe e remove espaços em branco antes de comparar
+        if (code != null && adminCode.equals(code.trim())) {
+            return ResponseEntity.ok().body(Map.of("message", "Login autorizado"));
+        }
+        
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Código inválido"));
     }
 }

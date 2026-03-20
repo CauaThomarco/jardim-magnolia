@@ -11,7 +11,7 @@ export default function LoginPage({ onNavigate }) {
   const handleLogin = (e) => {
     e.preventDefault();
     console.log('Login payload:', { email, password: pass });
-    // fetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password: pass }) })
+    // fetch('http://localhost:8080/api/auth/login')
   };
 
   // Java backend: POST /api/auth/admin  { code }

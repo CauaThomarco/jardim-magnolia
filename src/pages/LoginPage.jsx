@@ -16,10 +16,11 @@ export default function LoginPage({ onNavigate }) {
 
   // Java backend: POST /api/auth/admin  { code }
   const handleAdmin = (e) => {
-    e.preventDefault();
-    console.log('Admin payload:', { code: admin });
-    // fetch('/api/auth/admin', { method: 'POST', body: JSON.stringify({ code: admin }) })
-  };
+  e.preventDefault();
+  if (admin.trim()) {
+    onNavigate('admin'); // ← isso estava faltando
+  }
+ };
 
   return (
     <div>

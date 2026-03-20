@@ -39,6 +39,11 @@ public class Produto {
     @Column(nullable = false)
     private Boolean ativo = true;
 
+    // ── CATEGORIA ────────────────────────────────────────────────────────────
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CategoriaProduto categoria = CategoriaProduto.BUQUES;
+
     @Column(name = "imagem_url")
     private String imagemUrl;
 

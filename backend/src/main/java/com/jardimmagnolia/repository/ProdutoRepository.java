@@ -1,5 +1,6 @@
 package com.jardimmagnolia.repository;
 
+import com.jardimmagnolia.model.CategoriaProduto;
 import com.jardimmagnolia.model.Produto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -8,7 +9,15 @@ import java.util.List;
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
+    // Vitrine — apenas ativos
     List<Produto> findByAtivoTrue();
 
-    List<Produto> findByNomeContainingIgnoreCase(String nome);
+    // Por categoria (vitrine)
+    List<Produto> findByCategoriaAndAtivoTrue(CategoriaProduto categoria);
+
+    // Admin — todos
+    List<Produto> findAllByOrderByCategoriaAscNomeAsc();
+
+    // Busca por nome
+    List<Produto> findByNomeContainingIgnoreCaseAndAtivoTrue(String nome);
 }

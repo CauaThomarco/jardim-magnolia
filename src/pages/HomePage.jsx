@@ -1,13 +1,15 @@
-import { useState } from 'react';
 import Carousel from '../components/Carousel.jsx';
 import Stars from '../components/Stars.jsx';
 import Footer from '../components/Footer.jsx';
-import {
-  BOUQUETS, ORCHIDS, BIRTHDAY, ROSES, CAMPO,
-  HOW_TO, GIFT_CATEGORIES, IMAGES,
-} from '../data/index.js';
+import { useProdutos, CATEGORIA_LABELS } from '../hooks/useProdutos.js';
+import { HOW_TO, GIFT_CATEGORIES, IMAGES } from '../data/index.js';
+
+// Ordem de exibição dos carrosséis na home
+const CAROUSEL_ORDER = ['BUQUES', 'ORQUIDEAS', 'ANIVERSARIO', 'ROSAS', 'CAMPO', 'PRESENTES', 'CESTAS', 'PLANTAS'];
 
 export default function HomePage({ onNavigate, onAddToCart }) {
+  const { grupos, loading } = useProdutos();
+
   return (
     <div className="home">
       {/* Hero */}
@@ -23,15 +25,12 @@ export default function HomePage({ onNavigate, onAddToCart }) {
             Confira
           </button>
         </div>
-
-        {/* Map placeholder */}
         <div className="hero__map">
           <img
             src={IMAGES.hero}
             alt="Entrega de flores"
             style={{ filter: 'brightness(0.45) saturate(0.6)' }}
           />
-          {/* Map overlay */}
           <div style={{
             position: 'absolute', inset: 0,
             background: 'linear-gradient(90deg, rgba(27,58,45,0.9) 0%, rgba(27,58,45,0.1) 60%)',
@@ -39,47 +38,37 @@ export default function HomePage({ onNavigate, onAddToCart }) {
         </div>
       </div>
 
-      {/* Carousels */}
       <div className="container">
-        <Carousel
-          title="Buquês de Flores"
-          items={BOUQUETS}
-          onItemClick={() => onNavigate('product')}
-          onAddToCart={onAddToCart}
-        />
 
-        <Carousel
-          title="Orquídeas"
-          items={ORCHIDS}
-          onItemClick={() => onNavigate('product')}
-          onAddToCart={onAddToCart}
-        />
+        {/* Loading state */}
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--gray-500)' }}>
+            <div className="home-loading-spinner" />
+            <p style={{ marginTop: 12, fontSize: 14 }}>Carregando produtos...</p>
+          </div>
+        )}
 
-        <Carousel
-          title="Presentes de Aniversário"
-          items={BIRTHDAY}
-          onItemClick={() => onNavigate('product')}
-          onAddToCart={onAddToCart}
-        />
+        {/* Carrosséis dinâmicos — um por categoria */}
+        {!loading && CAROUSEL_ORDER.map((cat) => {
+          const items = grupos[cat];
+          if (!items || items.length === 0) return null;
+          return (
+            <Carousel
+              key={cat}
+              title={CATEGORIA_LABELS[cat] || cat}
+              items={items}
+              onItemClick={() => onNavigate('product')}
+              onAddToCart={onAddToCart}
+            />
+          );
+        })}
 
-        <Carousel
-          title="Rosas"
-          items={ROSES}
-          onItemClick={() => onNavigate('product')}
-          onAddToCart={onAddToCart}
-        />
-
-        <Carousel
-          title="Flores do Campo"
-          items={CAMPO}
-          onItemClick={() => onNavigate('product')}
-          onAddToCart={onAddToCart}
-        />
-
-        {/* How to buy */}
+        {/* Avaliações de clientes */}
         <div className="section">
-          <h2 className="section__title text-center">Como é comprar com a gente?</h2>
-          <p style={{ textAlign: 'center', color: 'var(--gray-500)', fontSize: 14, marginTop: 4, marginBottom: 20 }}>
+          <div className="section__header">
+            <h2 className="section__title">Como é comprar com a gente?</h2>
+          </div>
+          <p style={{ color: 'var(--gray-500)', fontSize: 14, marginBottom: 20 }}>
             Avaliações de clientes reais
           </p>
           <div className="reviews-grid">
@@ -96,18 +85,31 @@ export default function HomePage({ onNavigate, onAddToCart }) {
           </div>
         </div>
 
-        {/* Online gifts */}
+        {/* Presentes Online — categorias clicáveis */}
         <div className="section">
-          <h2 className="section__title text-center">Presentes Online</h2>
+          <div className="section__header">
+            <h2 className="section__title">Presentes Online</h2>
+            <button
+              className="section__ver-todos"
+              onClick={() => onNavigate('presentes')}
+            >
+              Ver todos →
+            </button>
+          </div>
           <div className="gifts-grid">
             {GIFT_CATEGORIES.map((g, i) => (
-              <div key={i} className="gift-item">
+              <div
+                key={i}
+                className="gift-item"
+                onClick={() => onNavigate('presentes', { categoria: g.categoria })}
+              >
                 <div className="gift-item__emoji">{g.emoji}</div>
                 <div className="gift-item__label">{g.label}</div>
               </div>
             ))}
           </div>
         </div>
+
       </div>
 
       <Footer onNavigate={onNavigate} />

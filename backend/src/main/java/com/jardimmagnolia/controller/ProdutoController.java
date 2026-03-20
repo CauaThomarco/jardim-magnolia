@@ -1,5 +1,6 @@
 package com.jardimmagnolia.controller;
 
+import com.jardimmagnolia.model.CategoriaProduto;
 import com.jardimmagnolia.model.Produto;
 import com.jardimmagnolia.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,13 +28,19 @@ public class ProdutoController {
         this.repo = repo;
     }
 
-    // GET /api/produtos  — ativos (vitrine)
+    // GET /api/produtos  — todos ativos (vitrine geral)
     @GetMapping
     public List<Produto> listar() {
         return repo.findByAtivoTrue();
     }
 
-    // GET /api/produtos/admin  — todos (admin)
+    // GET /api/produtos/categoria/{cat}  — por categoria
+    @GetMapping("/categoria/{categoria}")
+    public List<Produto> porCategoria(@PathVariable CategoriaProduto categoria) {
+        return repo.findByCategoriaAndAtivoTrue(categoria);
+    }
+
+    // GET /api/produtos/admin  — todos (admin, inclui inativos)
     @GetMapping("/admin")
     public List<Produto> listarAdmin() {
         return repo.findAll();
@@ -47,13 +54,20 @@ public class ProdutoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // GET /api/produtos/buscar?nome=rosa
+    @GetMapping("/buscar")
+    public List<Produto> buscarPorNome(@RequestParam String nome) {
+        return repo.findByNomeContainingIgnoreCaseAndAtivoTrue(nome);
+    }
+
     // POST /api/produtos  — cadastrar (multipart/form-data)
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Produto> cadastrar(
-            @RequestParam("nome")      String nome,
-            @RequestParam("descricao") String descricao,
-            @RequestParam("preco")     BigDecimal preco,
-            @RequestParam("estoque")   Integer estoque,
+            @RequestParam("nome")       String nome,
+            @RequestParam("descricao")  String descricao,
+            @RequestParam("preco")      BigDecimal preco,
+            @RequestParam("estoque")    Integer estoque,
+            @RequestParam("categoria")  CategoriaProduto categoria,
             @RequestParam(value = "imagem", required = false) MultipartFile imagem
     ) throws IOException {
 
@@ -67,6 +81,7 @@ public class ProdutoController {
                 .descricao(descricao)
                 .preco(preco)
                 .estoque(estoque)
+                .categoria(categoria)
                 .ativo(true)
                 .imagemUrl(imagemUrl)
                 .build();
@@ -78,10 +93,11 @@ public class ProdutoController {
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Produto> editar(
             @PathVariable Long id,
-            @RequestParam("nome")      String nome,
-            @RequestParam("descricao") String descricao,
-            @RequestParam("preco")     BigDecimal preco,
-            @RequestParam("estoque")   Integer estoque,
+            @RequestParam("nome")       String nome,
+            @RequestParam("descricao")  String descricao,
+            @RequestParam("preco")      BigDecimal preco,
+            @RequestParam("estoque")    Integer estoque,
+            @RequestParam("categoria")  CategoriaProduto categoria,
             @RequestParam(value = "imagem", required = false) MultipartFile imagem
     ) throws IOException {
 
@@ -90,20 +106,17 @@ public class ProdutoController {
             p.setDescricao(descricao);
             p.setPreco(preco);
             p.setEstoque(estoque);
+            p.setCategoria(categoria);
 
             if (imagem != null && !imagem.isEmpty()) {
-                try {
-                    p.setImagemUrl(salvarImagem(imagem));
-                } catch (IOException e) {
-                    throw new RuntimeException("Erro ao salvar imagem", e);
-                }
+                try { p.setImagemUrl(salvarImagem(imagem)); }
+                catch (IOException e) { throw new RuntimeException("Erro ao salvar imagem", e); }
             }
-
             return ResponseEntity.ok(repo.save(p));
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // PATCH /api/produtos/{id}/toggle  — ativa/inativa
+    // PATCH /api/produtos/{id}/toggle
     @PatchMapping("/{id}/toggle")
     public ResponseEntity<Produto> toggle(@PathVariable Long id) {
         return repo.findById(id).map(p -> {
@@ -120,20 +133,15 @@ public class ProdutoController {
         return ResponseEntity.noContent().build();
     }
 
-    // ── Salvar imagem no disco ──────────────────────────────────────────────
     private String salvarImagem(MultipartFile file) throws IOException {
         Path dir = Paths.get(uploadDir);
         Files.createDirectories(dir);
-
         String ext = Optional.ofNullable(file.getOriginalFilename())
                 .filter(f -> f.contains("."))
                 .map(f -> f.substring(f.lastIndexOf(".")))
                 .orElse(".jpg");
-
         String filename = UUID.randomUUID() + ext;
-        Files.copy(file.getInputStream(), dir.resolve(filename),
-                   StandardCopyOption.REPLACE_EXISTING);
-
+        Files.copy(file.getInputStream(), dir.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
         return "/uploads/" + filename;
     }
 }

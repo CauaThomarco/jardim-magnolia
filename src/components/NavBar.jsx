@@ -1,0 +1,110 @@
+import { useState } from 'react';
+
+export default function NavBar({ currentPage, onNavigate, cartCount }) {
+  const navLinks = [
+    'Buquês', 'Arranjos', 'Flores em Vasos',
+    'Ocasiões', 'Presentes', 'Dicas para Cuidado',
+  ];
+
+  return (
+    <nav className="navbar">
+      <div className="navbar__inner">
+
+        {/* ── Top row ─────────────────────────────────────────────────── */}
+        <div className="navbar__top">
+
+          {/* Logo */}
+          <div className="navbar__logo" onClick={() => onNavigate('home')}>
+            <div className="navbar__logo-circle">
+              <img
+                src="/src/assets/images/logo.png"
+                alt="Jardim Magnólia"
+                onError={(e) => {
+                  // Fallback: mostra ícone de folha se a logo não existir ainda
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.nextSibling.style.display = 'flex';
+                }}
+              />
+              {/* Fallback visível enquanto não há imagem */}
+              <span style={{
+                display: 'none',
+                width: '100%',
+                height: '100%',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 22,
+              }}>
+                🌿
+              </span>
+            </div>
+
+            <div className="navbar__logo-text">
+              <div className="navbar__logo-name">Jardim</div>
+              <div className="navbar__logo-name">Magnólia</div>
+              <div className="navbar__logo-sub">Floricultura Autoral</div>
+            </div>
+          </div>
+
+          {/* Search */}
+          <div className="navbar__search">
+            <input type="text" placeholder="Buscar flores, buquês, arranjos..." />
+            <span className="navbar__search-icon">🔍</span>
+          </div>
+
+          {/* Address button */}
+          <button className="navbar__address-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            Informe seu endereço de entrega
+          </button>
+
+          {/* Icons */}
+          <div className="navbar__icons">
+
+            {/* Cart — abre a página do carrinho */}
+            <div
+              className="navbar__cart"
+              onClick={() => onNavigate('cart')}
+              title="Ver carrinho"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B3A2D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="9" cy="21" r="1"/>
+                <circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+              </svg>
+              {cartCount > 0 && (
+                <span className="navbar__cart-badge">{cartCount}</span>
+              )}
+            </div>
+
+            {/* User / Login */}
+            <div className="navbar__user" onClick={() => onNavigate('login')}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B3A2D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span>Entrar</span>
+            </div>
+
+          </div>
+        </div>
+
+        {/* ── Nav links ───────────────────────────────────────────────── */}
+        <div className="navbar__nav">
+          {navLinks.map((link) => (
+            <button
+              key={link}
+              className={`navbar__nav-link ${currentPage === link ? 'active' : ''}`}
+              onClick={() => onNavigate('home')}
+            >
+              {link}
+            </button>
+          ))}
+        </div>
+
+      </div>
+    </nav>
+  );
+}

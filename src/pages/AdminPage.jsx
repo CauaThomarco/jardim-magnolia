@@ -1,5 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useProdutosAdmin, CATEGORIA_LABELS, CATEGORIA_OPTIONS, API } from '../hooks/useProdutos.js';
+import {
+  getDashboardMetrics,
+  readAdminPedidos,
+  removeAdminProduto,
+  toggleAdminProduto,
+  updateAdminPedidoStatus,
+  upsertAdminProduto,
+  writeAdminPedidos,
+} from '../utils/adminStore.js';
 
 const fmt = (n = 0) => 'R$' + Number(n).toFixed(2).replace('.', ',');
 
@@ -41,14 +50,14 @@ function MetricCard({ icon, label, value, sub, color = '#1B3A2D' }) {
 function TabDashboard() {
   const [dash, setDash] = useState(null);
 
-  useState(() => {
+  useEffect(() => {
     fetch(`${API}/admin/dashboard`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error('Erro ao buscar dashboard');
+        return r.json();
+      })
       .then(setDash)
-      .catch(() => setDash({
-        vendasMes: 18450.90, pedidosMes: 143,
-        entregasPendentes: 12, lucroMes: 9820.40, ticketMedio: 129.03,
-      }));
+      .catch(() => setDash(getDashboardMetrics()));
   }, []);
 
   if (!dash) return <p style={{ color: 'var(--gray-500)' }}>Carregando métricas...</p>;
@@ -72,29 +81,31 @@ function PedidosTable({ compact = false }) {
   const [pedidos, setPedidos] = useState([]);
   const [filter,  setFilter]  = useState('todos');
 
-  useState(() => {
+  useEffect(() => {
     fetch(`${API}/pedidos`)
-      .then((r) => r.json())
-      .then(setPedidos)
-      .catch(() => setPedidos([
-        { id: 143, clienteNome: 'Ana Beatriz', total: 149.90, status: 'ENTREGUE', criadoEm: '2026-03-18' },
-        { id: 142, clienteNome: 'Pedro Cruz',  total: 210.00, status: 'EM_ROTA',  criadoEm: '2026-03-18' },
-        { id: 141, clienteNome: 'Mario Julie', total: 179.41, status: 'EM_ROTA',  criadoEm: '2026-03-17' },
-        { id: 140, clienteNome: 'Lauro M.',    total: 349.90, status: 'PENDENTE', criadoEm: '2026-03-17' },
-      ]));
+      .then((r) => {
+        if (!r.ok) throw new Error('Erro ao buscar pedidos');
+        return r.json();
+      })
+      .then((data) => {
+        writeAdminPedidos(data);
+        setPedidos(data);
+      })
+      .catch(() => setPedidos(readAdminPedidos()));
   }, []);
 
   const atualizarStatus = async (id, status) => {
     try {
-      await fetch(`${API}/pedidos/${id}/status`, {
+      const res = await fetch(`${API}/pedidos/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       });
-      setPedidos((prev) => prev.map((p) => p.id === id ? { ...p, status } : p));
-    } catch {
-      setPedidos((prev) => prev.map((p) => p.id === id ? { ...p, status } : p));
-    }
+      if (!res.ok) throw new Error('Erro ao atualizar pedido');
+    } catch {}
+
+    const updated = updateAdminPedidoStatus(id, status);
+    setPedidos(updated);
   };
 
   const filtrados = filter === 'todos' ? pedidos : pedidos.filter((p) => p.status === filter.toUpperCase());
@@ -162,23 +173,31 @@ function TabPedidos() { return <PedidosTable />; }
 function TabEntregas() {
   const [pedidos, setPedidos] = useState([]);
 
-  useState(() => {
+  useEffect(() => {
     fetch(`${API}/pedidos`)
-      .then((r) => r.json())
-      .then(setPedidos)
-      .catch(() => {});
+      .then((r) => {
+        if (!r.ok) throw new Error('Erro ao buscar entregas');
+        return r.json();
+      })
+      .then((data) => {
+        writeAdminPedidos(data);
+        setPedidos(data);
+      })
+      .catch(() => setPedidos(readAdminPedidos()));
   }, []);
 
   const pendentes = pedidos.filter((p) => p.status === 'PENDENTE' || p.status === 'EM_ROTA');
 
   const confirmar = async (id) => {
     try {
-      await fetch(`${API}/pedidos/${id}/status`, {
+      const res = await fetch(`${API}/pedidos/${id}/status`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'ENTREGUE' }),
       });
+      if (!res.ok) throw new Error('Erro ao confirmar entrega');
     } catch {}
-    setPedidos((prev) => prev.map((p) => p.id === id ? { ...p, status: 'ENTREGUE' } : p));
+    const updated = updateAdminPedidoStatus(id, 'ENTREGUE');
+    setPedidos(updated);
   };
 
   return (
@@ -249,16 +268,23 @@ function TabProdutos() {
   const handleDelete = async (id) => {
     if (!window.confirm('Remover este produto?')) return;
     try {
-      await fetch(`${API}/produtos/${id}`, { method: 'DELETE' });
-    } catch {}
-    setProdutos((prev) => prev.filter((p) => p.id !== id));
+      const res = await fetch(`${API}/produtos/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Erro ao remover produto');
+    } catch {
+      setProdutos(removeAdminProduto(id));
+      return;
+    }
+    await refetch();
   };
 
   const handleToggle = async (id, ativo) => {
     try {
-      await fetch(`${API}/produtos/${id}/toggle`, { method: 'PATCH' });
+      const res = await fetch(`${API}/produtos/${id}/toggle`, { method: 'PATCH' });
+      if (!res.ok) throw new Error('Erro ao alterar status do produto');
+      await refetch();
+      return;
     } catch {}
-    setProdutos((prev) => prev.map((p) => p.id === id ? { ...p, ativo: !ativo } : p));
+    setProdutos(toggleAdminProduto(id));
   };
 
   const handleSave = async (e) => {
@@ -273,12 +299,23 @@ function TabProdutos() {
       fd.append('categoria', form.categoria);
       if (form.imgFile) fd.append('imagem', form.imgFile);
 
-      const url    = editing ? `${API}/produtos/${editing}` : `${API}/produtos`;
+      const url = editing ? `${API}/produtos/${editing}` : `${API}/produtos`;
       const method = editing ? 'PUT' : 'POST';
-      await fetch(url, { method, body: fd });
+      const res = await fetch(url, { method, body: fd });
+      if (!res.ok) throw new Error('Erro ao salvar produto');
       await refetch();
     } catch {
-      // fallback offline
+      const fallbackProduto = {
+        id: editing || Date.now(),
+        name: form.nome,
+        price: Number(form.preco),
+        estoque: Number(form.estoque),
+        descricao: form.descricao,
+        categoria: form.categoria,
+        img: form.imgPreview,
+        ativo: true,
+      };
+      setProdutos(upsertAdminProduto(fallbackProduto));
     } finally {
       setSaving(false);
       setShowForm(false);

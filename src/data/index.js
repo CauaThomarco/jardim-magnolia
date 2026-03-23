@@ -44,6 +44,7 @@ export const DELIVERY_DATES = [
   { short: 'Sex', date: '20/03', available: false },
   { short: 'Sáb', date: '21/03', available: false },
 ];
+
 export const RELATED = [
   {
     id: 101,
@@ -70,6 +71,7 @@ export const RELATED = [
     img: IMAGES.product1,
   },
 ];
+
 // Categorias da seção "Presentes Online"
 // campo: categoria usada para filtrar em PresentesPage
 export const GIFT_CATEGORIES = [

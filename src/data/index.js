@@ -44,7 +44,32 @@ export const DELIVERY_DATES = [
   { short: 'Sex', date: '20/03', available: false },
   { short: 'Sáb', date: '21/03', available: false },
 ];
-
+export const RELATED = [
+  {
+    id: 101,
+    name: 'Buquê Rosas Premium',
+    price: 189.90,
+    img: IMAGES.rose12,
+  },
+  {
+    id: 102,
+    name: 'Arranjo Encanto do Campo',
+    price: 129.90,
+    img: IMAGES.hero,
+  },
+  {
+    id: 103,
+    name: 'Caixa com Rosas Vermelhas',
+    price: 219.90,
+    img: IMAGES.rose14,
+  },
+  {
+    id: 104,
+    name: 'Orquídea Presente Especial',
+    price: 159.90,
+    img: IMAGES.product1,
+  },
+];
 // Categorias da seção "Presentes Online"
 // campo: categoria usada para filtrar em PresentesPage
 export const GIFT_CATEGORIES = [

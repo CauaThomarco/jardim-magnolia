@@ -18,6 +18,8 @@ const THUMBS = [
   IMAGES.rose14,
 ];
 
+const relatedProducts = Array.isArray(RELATED) ? RELATED : [];
+
 export default function ProductPage({ onNavigate, onAddToCart }) {
   const [selectedDate, setSelectedDate] = useState(0);
   const [qty,          setQty]          = useState(1);
@@ -221,7 +223,7 @@ export default function ProductPage({ onNavigate, onAddToCart }) {
           <h2 className="related__title">Você também pode gostar</h2>
           <div className="related__divider" />
           <div className="related__grid">
-            {RELATED.map((p) => (
+            {relatedProducts.map((p) => (
               <MiniCard
                 key={p.id}
                 item={p}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { readAdminProdutos, writeAdminProdutos } from '../utils/adminStore.js';
 
 const API = 'http://localhost:8080/api';
 
@@ -15,19 +16,35 @@ const FALLBACK = {
 };
 
 // Normaliza produto da API para o formato usado no frontend
+function resolveImageUrl(produto) {
+  const image = produto.imagemUrl || produto.img;
+
+  if (!image) return FALLBACK[produto.categoria] || FALLBACK.BUQUES;
+  if (image.startsWith('data:') || image.startsWith('http://') || image.startsWith('https://')) return image;
+
+  return `${API.replace('/api', '')}${image}`;
+}
+
 export function normalizeProduto(p) {
   return {
     id:        p.id,
-    name:      p.nome,
-    price:     parseFloat(p.preco),
-    img:       p.imagemUrl
-                 ? `${API.replace('/api', '')}${p.imagemUrl}`
-                 : FALLBACK[p.categoria] || FALLBACK.BUQUES,
-    estoque:   p.estoque,
-    ativo:     p.ativo,
-    categoria: p.categoria,
-    descricao: p.descricao,
+    name:      p.nome ?? p.name,
+    price:     parseFloat(p.preco ?? p.price ?? 0),
+    img:       resolveImageUrl(p),
+    estoque:   Number(p.estoque ?? 0),
+    ativo:     p.ativo ?? true,
+    categoria: p.categoria || 'BUQUES',
+    descricao: p.descricao || '',
   };
+}
+
+function agruparProdutos(produtos) {
+  return produtos.reduce((grouped, produto) => {
+    const cat = produto.categoria || 'BUQUES';
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(produto);
+    return grouped;
+  }, {});
 }
 
 // Hook para buscar todos os produtos ativos, agrupados por categoria
@@ -42,17 +59,12 @@ export function useProdutos() {
       const res = await fetch(`${API}/produtos`);
       if (!res.ok) throw new Error('Erro ao buscar produtos');
       const data = await res.json();
-
-      // Agrupa por categoria
-      const grouped = {};
-      data.forEach((p) => {
-        const cat = p.categoria || 'BUQUES';
-        if (!grouped[cat]) grouped[cat] = [];
-        grouped[cat].push(normalizeProduto(p));
-      });
-      setGrupos(grouped);
+      const ativos = data.map(normalizeProduto);
+      setGrupos(agruparProdutos(ativos));
     } catch (err) {
-      console.warn('Backend indisponível, usando dados estáticos:', err.message);
+      console.warn('Backend indisponível, usando produtos salvos no navegador:', err.message);
+      const offline = readAdminProdutos().map(normalizeProduto).filter((produto) => produto.ativo);
+      setGrupos(agruparProdutos(offline));
       setError(err.message);
     } finally {
       setLoading(false);
@@ -75,9 +87,12 @@ export function useProdutosAdmin() {
       const res = await fetch(`${API}/produtos/admin`);
       if (!res.ok) throw new Error('Erro');
       const data = await res.json();
-      setProdutos(data.map(normalizeProduto));
+      const normalized = data.map(normalizeProduto);
+      writeAdminProdutos(normalized);
+      setProdutos(normalized);
     } catch (err) {
-      console.warn('Usando mock data:', err.message);
+      console.warn('Backend indisponível, usando produtos salvos no navegador:', err.message);
+      setProdutos(readAdminProdutos().map(normalizeProduto));
     } finally {
       setLoading(false);
     }

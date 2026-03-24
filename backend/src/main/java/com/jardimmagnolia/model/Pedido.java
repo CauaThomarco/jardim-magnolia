@@ -20,6 +20,9 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "cliente_id", nullable = false)
+    private Long clienteId;
+
     @NotBlank(message = "Nome do cliente é obrigatório")
     @Column(name = "cliente_nome", nullable = false)
     private String clienteNome;

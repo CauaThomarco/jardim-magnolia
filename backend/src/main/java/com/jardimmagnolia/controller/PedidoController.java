@@ -2,6 +2,7 @@ package com.jardimmagnolia.controller;
 
 import com.jardimmagnolia.model.Pedido;
 import com.jardimmagnolia.model.StatusPedido;
+import com.jardimmagnolia.repository.ClienteRepository;
 import com.jardimmagnolia.repository.PedidoRepository;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -14,18 +15,18 @@ import java.util.Map;
 public class PedidoController {
 
     private final PedidoRepository repo;
+    private final ClienteRepository clienteRepository;
 
-    public PedidoController(PedidoRepository repo) {
+    public PedidoController(PedidoRepository repo, ClienteRepository clienteRepository) {
         this.repo = repo;
+        this.clienteRepository = clienteRepository;
     }
 
-    // GET /api/pedidos
     @GetMapping
     public List<Pedido> listar() {
         return repo.findAllByOrderByCriadoEmDesc();
     }
 
-    // GET /api/pedidos/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Pedido> buscar(@PathVariable Long id) {
         return repo.findById(id)
@@ -33,15 +34,18 @@ public class PedidoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // GET /api/pedidos/status/{status}
     @GetMapping("/status/{status}")
     public List<Pedido> porStatus(@PathVariable StatusPedido status) {
         return repo.findByStatus(status);
     }
 
-    // POST /api/pedidos  — criar pedido (checkout)
     @PostMapping
-    public ResponseEntity<Pedido> criar(@RequestBody Pedido pedido) {
+    public ResponseEntity<?> criar(@RequestBody Pedido pedido) {
+        if (pedido.getClienteId() == null || !clienteRepository.existsById(pedido.getClienteId())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Você precisa estar logado para finalizar a compra."));
+        }
+
         pedido.setStatus(StatusPedido.PENDENTE);
         if (pedido.getMetodoPagamento() == null || pedido.getMetodoPagamento().isBlank()) {
             pedido.setMetodoPagamento("DINHEIRO_NA_ENTREGA");
@@ -49,7 +53,6 @@ public class PedidoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(repo.save(pedido));
     }
 
-    // PATCH /api/pedidos/{id}/status  — Body: { "status": "EM_ROTA" }
     @PatchMapping("/{id}/status")
     public ResponseEntity<Pedido> atualizarStatus(
             @PathVariable Long id,
@@ -61,7 +64,6 @@ public class PedidoController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // POST /api/cart/add — Body: { "productId": 1, "quantity": 2 }
     @PostMapping("/cart/add")
     public ResponseEntity<?> addToCart(@RequestBody Map<String, Object> body) {
         return ResponseEntity.ok(Map.of(

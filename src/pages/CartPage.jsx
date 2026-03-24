@@ -54,7 +54,7 @@ function CheckoutForm({ cliente, onChange }) {
   );
 }
 
-function OrderSummary({ items, cliente, onClienteChange, onCheckout, loading, error }) {
+function OrderSummary({ items, cliente, onClienteChange, onCheckout, loading, error, clienteLogado, onNavigate }) {
   const subtotal = items.reduce((acc, i) => acc + i.price * i.qty, 0);
   const shipping = subtotal > 200 ? 0 : 19.90;
   const total = subtotal + shipping;
@@ -69,9 +69,16 @@ function OrderSummary({ items, cliente, onClienteChange, onCheckout, loading, er
       <div className="cart-summary__divider" />
       <div className="cart-summary__total"><span>Total</span><span>{fmt(total)}</span></div>
 
+      {!clienteLogado && (
+        <div style={{ background: '#fff4e5', color: '#7a4b00', padding: '10px 12px', borderRadius: 8, marginTop: 12, fontSize: 13 }}>
+          Faça login para finalizar a compra.
+          <button onClick={() => onNavigate('login')} style={{ marginLeft: 8, border: 'none', background: 'transparent', color: '#1B3A2D', fontWeight: 700, textDecoration: 'underline' }}>Entrar</button>
+        </div>
+      )}
+
       <CheckoutForm cliente={cliente} onChange={onClienteChange} />
 
-      <button className="cart-summary__checkout" onClick={() => onCheckout({ subtotal, shipping, total })} disabled={loading}>
+      <button className="cart-summary__checkout" onClick={() => onCheckout({ subtotal, shipping, total })} disabled={loading || !clienteLogado}>
         {loading ? 'Enviando pedido...' : 'Finalizar compra'}
       </button>
 
@@ -109,6 +116,11 @@ export default function CartPage({ cart, onNavigate, onQtyChange, onRemove, onOr
   const handleCheckout = async () => {
     setError('');
 
+    if (!cliente?.id) {
+      setError('Você precisa estar logado para finalizar a compra.');
+      return;
+    }
+
     if (!dadosCliente.nome || !dadosCliente.email || !dadosCliente.telefone || !dadosCliente.endereco) {
       setError('Preencha todos os dados para finalizar o pedido.');
       return;
@@ -117,6 +129,7 @@ export default function CartPage({ cart, onNavigate, onQtyChange, onRemove, onOr
     setLoading(true);
     try {
       const payload = {
+        clienteId: cliente.id,
         clienteNome: dadosCliente.nome,
         clienteEmail: dadosCliente.email,
         clienteTelefone: dadosCliente.telefone,
@@ -131,14 +144,17 @@ export default function CartPage({ cart, onNavigate, onQtyChange, onRemove, onOr
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || 'Não foi possível finalizar o pedido.');
 
       setPedidoId(data.id);
       setOrdered(true);
       onOrderFinished?.();
     } catch (err) {
-      setError(err.message || 'Erro inesperado ao criar pedido.');
+      const msg = err?.message === 'Failed to fetch'
+        ? 'Não foi possível conectar ao servidor. Verifique se o backend está em execução.'
+        : (err.message || 'Erro inesperado ao criar pedido.');
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -186,6 +202,8 @@ export default function CartPage({ cart, onNavigate, onQtyChange, onRemove, onOr
               onCheckout={handleCheckout}
               loading={loading}
               error={error}
+              clienteLogado={Boolean(cliente?.id)}
+              onNavigate={onNavigate}
             />
           </div>
         )}

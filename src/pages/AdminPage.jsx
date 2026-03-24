@@ -14,11 +14,11 @@ const fmt = (n = 0) => 'R$' + Number(n).toFixed(2).replace('.', ',');
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 const STATUS_MAP = {
-  pendente:  { label: 'Pendente',  color: '#856404', bg: '#fff3cd' },
+  pendente:  { label: 'Aguardando pagamento',  color: '#856404', bg: '#fff3cd' },
   em_rota:   { label: 'Em rota',   color: '#155724', bg: '#d4edda' },
   entregue:  { label: 'Entregue',  color: '#0c5460', bg: '#d1ecf1' },
   cancelado: { label: 'Cancelado', color: '#721c24', bg: '#f8d7da' },
-  PENDENTE:  { label: 'Pendente',  color: '#856404', bg: '#fff3cd' },
+  PENDENTE:  { label: 'Aguardando pagamento',  color: '#856404', bg: '#fff3cd' },
   EM_ROTA:   { label: 'Em rota',   color: '#155724', bg: '#d4edda' },
   ENTREGUE:  { label: 'Entregue',  color: '#0c5460', bg: '#d1ecf1' },
   CANCELADO: { label: 'Cancelado', color: '#721c24', bg: '#f8d7da' },
@@ -509,7 +509,7 @@ function AdminLogin({ onLogin }) {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch(`${API}/auth/admin`, {
+      const res = await fetch(`${API}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code }),

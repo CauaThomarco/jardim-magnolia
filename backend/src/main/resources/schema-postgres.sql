@@ -20,6 +20,16 @@ CREATE TABLE IF NOT EXISTS produto (
     criado_em   TIMESTAMP    NOT NULL DEFAULT NOW()
 );
 
+
+-- ─── Cliente ──────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS cliente (
+    id          BIGSERIAL    PRIMARY KEY,
+    nome        VARCHAR(255) NOT NULL,
+    email       VARCHAR(255) NOT NULL UNIQUE,
+    senha_hash  VARCHAR(255) NOT NULL,
+    criado_em   TIMESTAMP    NOT NULL DEFAULT NOW()
+);
+
 -- ─── Pedido ───────────────────────────────────────────────────
 CREATE TYPE status_pedido AS ENUM (
     'PENDENTE', 'EM_ROTA', 'ENTREGUE', 'CANCELADO'
@@ -31,6 +41,7 @@ CREATE TABLE IF NOT EXISTS pedido (
     cliente_email      VARCHAR(255),
     cliente_telefone   VARCHAR(20),
     endereco_entrega   TEXT          NOT NULL,
+    metodo_pagamento   VARCHAR(80)   NOT NULL DEFAULT 'DINHEIRO_NA_ENTREGA',
     total              NUMERIC(10,2) NOT NULL,
     status             status_pedido NOT NULL DEFAULT 'PENDENTE',
     criado_em          TIMESTAMP     NOT NULL DEFAULT NOW()

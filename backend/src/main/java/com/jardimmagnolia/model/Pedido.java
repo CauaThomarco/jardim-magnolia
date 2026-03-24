@@ -35,6 +35,10 @@ public class Pedido {
     @Column(name = "endereco_entrega", nullable = false)
     private String enderecoEntrega;
 
+    @Builder.Default
+    @Column(name = "metodo_pagamento", nullable = false)
+    private String metodoPagamento = "DINHEIRO_NA_ENTREGA";
+
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
 

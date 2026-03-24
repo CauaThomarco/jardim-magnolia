@@ -4,15 +4,22 @@ import Footer from '../components/Footer.jsx';
 import { useProdutos, CATEGORIA_LABELS } from '../hooks/useProdutos.js';
 import { HOW_TO, GIFT_CATEGORIES, IMAGES } from '../data/index.js';
 
-// Ordem de exibição dos carrosséis na home
 const CAROUSEL_ORDER = ['BUQUES', 'ORQUIDEAS', 'ANIVERSARIO', 'ROSAS', 'CAMPO', 'PRESENTES', 'CESTAS', 'PLANTAS'];
 
-export default function HomePage({ onNavigate, onAddToCart }) {
+export default function HomePage({ onNavigate, onAddToCart, searchTerm = '' }) {
   const { grupos, loading } = useProdutos();
+
+  const termo = searchTerm.trim().toLowerCase();
+  const gruposFiltrados = CAROUSEL_ORDER.reduce((acc, cat) => {
+    const items = grupos[cat] || [];
+    acc[cat] = !termo ? items : items.filter((item) => item.name.toLowerCase().includes(termo));
+    return acc;
+  }, {});
+
+  const totalResultados = Object.values(gruposFiltrados).reduce((sum, list) => sum + list.length, 0);
 
   return (
     <div className="home">
-      {/* Hero */}
       <div className="hero">
         <div className="hero__content">
           <span className="hero__tag">Presentes Únicos</span>
@@ -39,8 +46,6 @@ export default function HomePage({ onNavigate, onAddToCart }) {
       </div>
 
       <div className="container">
-
-        {/* Loading state */}
         {loading && (
           <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--gray-500)' }}>
             <div className="home-loading-spinner" />
@@ -48,9 +53,14 @@ export default function HomePage({ onNavigate, onAddToCart }) {
           </div>
         )}
 
-        {/* Carrosséis dinâmicos — um por categoria */}
+        {!loading && termo && (
+          <p style={{ color: 'var(--gray-500)', marginBottom: 18 }}>
+            Resultados para <strong>"{searchTerm}"</strong>: {totalResultados}
+          </p>
+        )}
+
         {!loading && CAROUSEL_ORDER.map((cat) => {
-          const items = grupos[cat];
+          const items = gruposFiltrados[cat];
           if (!items || items.length === 0) return null;
           return (
             <Carousel
@@ -63,7 +73,12 @@ export default function HomePage({ onNavigate, onAddToCart }) {
           );
         })}
 
-        {/* Avaliações de clientes */}
+        {!loading && termo && totalResultados === 0 && (
+          <div style={{ textAlign: 'center', color: 'var(--gray-500)', margin: '20px 0 32px' }}>
+            Nenhum produto encontrado com esse termo.
+          </div>
+        )}
+
         <div className="section">
           <div className="section__header">
             <h2 className="section__title">Como é comprar com a gente?</h2>
@@ -85,7 +100,6 @@ export default function HomePage({ onNavigate, onAddToCart }) {
           </div>
         </div>
 
-        {/* Presentes Online — categorias clicáveis */}
         <div className="section">
           <div className="section__header">
             <h2 className="section__title">Presentes Online</h2>

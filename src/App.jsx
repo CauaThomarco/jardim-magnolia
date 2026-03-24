@@ -3,6 +3,7 @@ import NavBar        from './components/NavBar.jsx';
 import HomePage      from './pages/HomePage.jsx';
 import ProductPage   from './pages/ProductPage.jsx';
 import LoginPage     from './pages/LoginPage.jsx';
+import CadastroPage  from './pages/CadastroPage.jsx';
 import ContactPage   from './pages/ContactPage.jsx';
 import CartPage      from './pages/CartPage.jsx';
 import AdminPage     from './pages/AdminPage.jsx';
@@ -12,6 +13,8 @@ export default function App() {
   const [page,           setPage]           = useState('home');
   const [pageParams,     setPageParams]     = useState({});
   const [cart,           setCart]           = useState([]);
+  const [searchTerm,     setSearchTerm]     = useState('');
+  const [cliente,        setCliente]        = useState(null);
 
   const cartCount = cart.reduce((acc, i) => acc + i.qty, 0);
 
@@ -22,6 +25,8 @@ export default function App() {
       return [...prev, { ...item, qty: item.qty ?? 1 }];
     });
   };
+
+  const clearCart = () => setCart([]);
 
   const changeQty = (id, delta) => {
     setCart((prev) =>
@@ -44,13 +49,29 @@ export default function App() {
 
   return (
     <div>
-      <NavBar currentPage={page} onNavigate={navigate} cartCount={cartCount} />
+      <NavBar
+        currentPage={page}
+        onNavigate={navigate}
+        cartCount={cartCount}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+      />
 
-      {page === 'home'      && <HomePage      onNavigate={navigate} onAddToCart={addToCart} />}
+      {page === 'home'      && <HomePage      onNavigate={navigate} onAddToCart={addToCart} searchTerm={searchTerm} />}
       {page === 'product'   && <ProductPage   onNavigate={navigate} onAddToCart={addToCart} />}
-      {page === 'login'     && <LoginPage     onNavigate={navigate} />}
+      {page === 'login'     && <LoginPage     onNavigate={navigate} onLoginCliente={setCliente} />}
+      {page === 'cadastro'  && <CadastroPage  onNavigate={navigate} onCadastroRealizado={setCliente} />}
       {page === 'contact'   && <ContactPage   onNavigate={navigate} />}
-      {page === 'cart'      && <CartPage      cart={cart} onNavigate={navigate} onQtyChange={changeQty} onRemove={removeItem} />}
+      {page === 'cart'      && (
+        <CartPage
+          cart={cart}
+          onNavigate={navigate}
+          onQtyChange={changeQty}
+          onRemove={removeItem}
+          onOrderFinished={clearCart}
+          cliente={cliente}
+        />
+      )}
       {page === 'presentes' && <PresentesPage onNavigate={navigate} onAddToCart={addToCart} initialCategoria={pageParams.categoria} />}
     </div>
   );

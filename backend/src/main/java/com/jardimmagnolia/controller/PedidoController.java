@@ -43,6 +43,9 @@ public class PedidoController {
     @PostMapping
     public ResponseEntity<Pedido> criar(@RequestBody Pedido pedido) {
         pedido.setStatus(StatusPedido.PENDENTE);
+        if (pedido.getMetodoPagamento() == null || pedido.getMetodoPagamento().isBlank()) {
+            pedido.setMetodoPagamento("DINHEIRO_NA_ENTREGA");
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(repo.save(pedido));
     }
 

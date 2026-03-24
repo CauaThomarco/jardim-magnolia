@@ -1,6 +1,4 @@
-import { useState } from 'react';
-
-export default function NavBar({ currentPage, onNavigate, cartCount }) {
+export default function NavBar({ currentPage, onNavigate, cartCount, searchTerm, onSearchChange }) {
   const navLinks = [
     'Buquês', 'Arranjos', 'Flores em Vasos',
     'Ocasiões', 'Presentes', 'Dicas para Cuidado',
@@ -20,12 +18,10 @@ export default function NavBar({ currentPage, onNavigate, cartCount }) {
                 src="/src/assets/images/logo.png"
                 alt="Jardim Magnólia"
                 onError={(e) => {
-                  // Fallback: mostra ícone de folha se a logo não existir ainda
                   e.currentTarget.style.display = 'none';
                   e.currentTarget.nextSibling.style.display = 'flex';
                 }}
               />
-              {/* Fallback visível enquanto não há imagem */}
               <span style={{
                 display: 'none',
                 width: '100%',
@@ -47,11 +43,16 @@ export default function NavBar({ currentPage, onNavigate, cartCount }) {
 
           {/* Search */}
           <div className="navbar__search">
-            <input type="text" placeholder="Buscar flores, buquês, arranjos..." />
+            <input
+              type="text"
+              placeholder="Buscar flores, buquês, arranjos..."
+              value={searchTerm}
+              onChange={(e) => onSearchChange?.(e.target.value)}
+              onFocus={() => onNavigate('home')}
+            />
             <span className="navbar__search-icon">🔍</span>
           </div>
 
-          {/* Address button */}
           <button className="navbar__address-btn">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
@@ -60,10 +61,7 @@ export default function NavBar({ currentPage, onNavigate, cartCount }) {
             Informe seu endereço de entrega
           </button>
 
-          {/* Icons */}
           <div className="navbar__icons">
-
-            {/* Cart — abre a página do carrinho */}
             <div
               className="navbar__cart"
               onClick={() => onNavigate('cart')}
@@ -79,7 +77,6 @@ export default function NavBar({ currentPage, onNavigate, cartCount }) {
               )}
             </div>
 
-            {/* User / Login */}
             <div className="navbar__user" onClick={() => onNavigate('login')}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B3A2D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -91,7 +88,6 @@ export default function NavBar({ currentPage, onNavigate, cartCount }) {
           </div>
         </div>
 
-        {/* ── Nav links ───────────────────────────────────────────────── */}
         <div className="navbar__nav">
           {navLinks.map((link) => (
             <button

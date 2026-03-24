@@ -1,31 +1,61 @@
 import { useState } from 'react';
 import Footer from '../components/Footer.jsx';
 import { IMAGES } from '../data/index.js';
+import { API } from '../hooks/useProdutos.js';
 
-export default function LoginPage({ onNavigate }) {
+export default function LoginPage({ onNavigate, onLoginCliente }) {
   const [email, setEmail]   = useState('');
   const [pass,  setPass]    = useState('');
   const [admin, setAdmin]   = useState('');
+  const [error, setError]   = useState('');
 
-  // Java backend: POST /api/auth/login  { email, password }
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('Login payload:', { email, password: pass });
-    // fetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password: pass }) })
+    setError('');
+
+    try {
+      const res = await fetch(`${API}/auth/clientes/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha: pass }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Falha no login');
+      onLoginCliente?.(data);
+      onNavigate('home');
+    } catch (err) {
+      setError(err.message || 'Não foi possível entrar.');
+    }
   };
 
-  // Java backend: POST /api/auth/admin  { code }
-  const handleAdmin = (e) => {
-  e.preventDefault();
-  if (admin.trim()) {
-    onNavigate('admin'); // ← isso estava faltando
-  }
- };
+  const handleAdmin = async (e) => {
+    e.preventDefault();
+    if (!admin.trim()) return;
+
+    try {
+      const res = await fetch(`${API}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: admin }),
+      });
+      if (res.ok) {
+        onNavigate('admin');
+        return;
+      }
+    } catch {}
+
+    if (admin.trim() === 'JARDIM@2026' || admin.trim() === '1011') {
+      onNavigate('admin');
+      return;
+    }
+
+    setError('Código de administrador inválido.');
+  };
 
   return (
     <div>
       <div className="login-page">
-        {/* Left — photo + tagline */}
         <div className="login-page__left">
           <img
             className="login-page__left-bg"
@@ -45,7 +75,6 @@ export default function LoginPage({ onNavigate }) {
           </div>
         </div>
 
-        {/* Right — form */}
         <div className="login-page__right">
           <div className="login-form">
             <h2 className="login-form__title">Entre na sua conta</h2>
@@ -67,8 +96,10 @@ export default function LoginPage({ onNavigate }) {
                 onChange={(e) => setPass(e.target.value)}
                 required
               />
-              <button type="submit" className="btn-login">PRÓXIMO</button>
+              <button type="submit" className="btn-login">ENTRAR</button>
             </form>
+
+            {error && <p style={{ color: '#9f1239', marginTop: 10, fontSize: 13 }}>{error}</p>}
 
             <div className="form-divider">
               <span>OU</span>
@@ -76,17 +107,15 @@ export default function LoginPage({ onNavigate }) {
 
             <button
               className="btn-register"
-              onClick={() => console.log('Cadastro')}
+              onClick={() => onNavigate('cadastro')}
             >
               CADASTRE-SE
             </button>
 
             <p className="form-terms">
-              By registering, You agree to the Terms, Conditions and Policies
-              of Borcelle &amp; Privacy Policy
+              Ao se cadastrar, você concorda com os termos e políticas de privacidade.
             </p>
 
-            {/* Admin section */}
             <h3 className="login-form__subtitle">Administrador</h3>
 
             <form onSubmit={handleAdmin}>

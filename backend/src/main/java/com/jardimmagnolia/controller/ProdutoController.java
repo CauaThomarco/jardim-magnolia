@@ -142,6 +142,6 @@ public class ProdutoController {
                 .orElse(".jpg");
         String filename = UUID.randomUUID() + ext;
         Files.copy(file.getInputStream(), dir.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
-        return "/uploads/" + filename;
+        return "/uploads/produtos/" + filename;
     }
 }

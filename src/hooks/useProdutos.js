@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { readAdminProdutos, writeAdminProdutos } from '../utils/adminStore.js';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
@@ -62,9 +61,7 @@ export function useProdutos() {
       const ativos = data.map(normalizeProduto);
       setGrupos(agruparProdutos(ativos));
     } catch (err) {
-      console.warn('Backend indisponível, usando produtos salvos no navegador:', err.message);
-      const offline = readAdminProdutos().map(normalizeProduto).filter((produto) => produto.ativo);
-      setGrupos(agruparProdutos(offline));
+      setGrupos({});
       setError(err.message);
     } finally {
       setLoading(false);
@@ -87,12 +84,10 @@ export function useProdutosAdmin() {
       const res = await fetch(`${API}/produtos/admin`);
       if (!res.ok) throw new Error('Erro');
       const data = await res.json();
-      const normalized = data.map(normalizeProduto);
-      writeAdminProdutos(normalized);
-      setProdutos(normalized);
+      setProdutos(data.map(normalizeProduto));
     } catch (err) {
-      console.warn('Backend indisponível, usando produtos salvos no navegador:', err.message);
-      setProdutos(readAdminProdutos().map(normalizeProduto));
+      console.warn('Backend indisponível:', err.message);
+      setProdutos([]);
     } finally {
       setLoading(false);
     }

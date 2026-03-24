@@ -2,6 +2,26 @@ import { useState } from 'react';
 import Footer from '../components/Footer.jsx';
 import { API } from '../hooks/useProdutos.js';
 
+function EyeIcon({ open }) {
+  if (open) {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2.06 12.34a1 1 0 0 1 0-.68 10.94 10.94 0 0 1 19.88 0 1 1 0 0 1 0 .68 10.94 10.94 0 0 1-19.88 0"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+    );
+  }
+
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m2 2 20 20"/>
+      <path d="M10.58 10.58a2 2 0 1 0 2.83 2.83"/>
+      <path d="M9.88 5.09A10.94 10.94 0 0 1 12 4.91c4.62 0 8.58 2.88 10 7.09a10.95 10.95 0 0 1-4.24 5.37"/>
+      <path d="M6.61 6.61A10.94 10.94 0 0 0 2 12c1.41 4.21 5.37 7.09 10 7.09 1.36 0 2.67-.25 3.88-.7"/>
+    </svg>
+  );
+}
+
 function PasswordField({ value, onChange, placeholder, visible, onToggle }) {
   return (
     <div className="password-field">
@@ -14,8 +34,8 @@ function PasswordField({ value, onChange, placeholder, visible, onToggle }) {
         required
         minLength={6}
       />
-      <button type="button" className="password-field__toggle" onClick={onToggle}>
-        {visible ? '🙈' : '👁️'}
+      <button type="button" className="password-field__toggle" onClick={onToggle} aria-label="Mostrar senha">
+        <EyeIcon open={visible} />
       </button>
     </div>
   );

@@ -40,7 +40,7 @@ function CartItem({ item, onQtyChange, onRemove }) {
   );
 }
 
-function CheckoutForm({ cliente, onChange }) {
+function CheckoutForm({ cliente, onChange, cepLoading }) {
   return (
     <div style={{ marginTop: 16, display: 'grid', gap: 10 }}>
       <input className="form-input" placeholder="Nome completo" value={cliente.nome} onChange={(e) => onChange('nome', e.target.value)} required />
@@ -48,9 +48,20 @@ function CheckoutForm({ cliente, onChange }) {
       <input className="form-input" placeholder="Telefone" value={cliente.telefone} onChange={(e) => onChange('telefone', e.target.value)} required />
       <div style={{ display: 'flex', gap: 8 }}>
         <input className="form-input" placeholder="CEP" value={cliente.cep || ''} onChange={(e) => onChange('cep', e.target.value)} required style={{ marginBottom: 0 }} />
-        <button type="button" className="btn-register" style={{ marginTop: 0, whiteSpace: 'nowrap' }} onClick={() => onChange('buscarCep')}>Buscar CEP</button>
+        <button type="button" className="btn-register" style={{ marginTop: 0, whiteSpace: 'nowrap' }} onClick={() => onChange('buscarCep')} disabled={cepLoading}>
+          {cepLoading ? 'Buscando...' : 'Buscar CEP'}
+        </button>
       </div>
-      <input className="form-input" placeholder="Endereço de entrega" value={cliente.endereco} onChange={(e) => onChange('endereco', e.target.value)} required />
+      <input className="form-input" placeholder="Rua / Logradouro" value={cliente.rua} onChange={(e) => onChange('rua', e.target.value)} required />
+      <input className="form-input" placeholder="Bairro" value={cliente.bairro} onChange={(e) => onChange('bairro', e.target.value)} required />
+      <div style={{ display: 'grid', gap: 8, gridTemplateColumns: '1fr 1fr' }}>
+        <input className="form-input" placeholder="Número" value={cliente.numero} onChange={(e) => onChange('numero', e.target.value)} required style={{ marginBottom: 0 }} />
+        <input className="form-input" placeholder="Complemento (opcional)" value={cliente.complemento} onChange={(e) => onChange('complemento', e.target.value)} style={{ marginBottom: 0 }} />
+      </div>
+      <div style={{ display: 'grid', gap: 8, gridTemplateColumns: '1fr 90px' }}>
+        <input className="form-input" placeholder="Cidade" value={cliente.cidade} onChange={(e) => onChange('cidade', e.target.value)} required style={{ marginBottom: 0 }} />
+        <input className="form-input" placeholder="UF" value={cliente.uf} onChange={(e) => onChange('uf', e.target.value.toUpperCase())} required maxLength={2} style={{ marginBottom: 0 }} />
+      </div>
       <div className="cart-summary__tag" style={{ marginTop: 2 }}>
         Pagamento: <strong>Dinheiro na hora da entrega</strong>
       </div>
@@ -58,7 +69,7 @@ function CheckoutForm({ cliente, onChange }) {
   );
 }
 
-function OrderSummary({ items, cliente, onClienteChange, onCheckout, loading, error, clienteLogado, onNavigate }) {
+function OrderSummary({ items, cliente, onClienteChange, onCheckout, loading, error, clienteLogado, onNavigate, cepLoading }) {
   const subtotal = items.reduce((acc, i) => acc + i.price * i.qty, 0);
   const shipping = subtotal > 200 ? 0 : 19.90;
   const total = subtotal + shipping;
@@ -80,7 +91,7 @@ function OrderSummary({ items, cliente, onClienteChange, onCheckout, loading, er
         </div>
       )}
 
-      <CheckoutForm cliente={cliente} onChange={onClienteChange} />
+      <CheckoutForm cliente={cliente} onChange={onClienteChange} cepLoading={cepLoading} />
 
       <button className="cart-summary__checkout" onClick={() => onCheckout({ subtotal, shipping, total })} disabled={loading || !clienteLogado}>
         {loading ? 'Enviando pedido...' : 'Finalizar compra'}
@@ -103,12 +114,19 @@ export default function CartPage({ cart, onNavigate, onQtyChange, onRemove, onOr
   const [pedidoId, setPedidoId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [cepLoading, setCepLoading] = useState(false);
+  const [ultimoCepBuscado, setUltimoCepBuscado] = useState('');
   const [dadosCliente, setDadosCliente] = useState({
     nome: cliente?.nome || '',
     email: cliente?.email || '',
     telefone: '',
     cep: '',
-    endereco: '',
+    rua: '',
+    bairro: '',
+    numero: '',
+    complemento: '',
+    cidade: '',
+    uf: '',
   });
 
   const total = useMemo(() => {
@@ -116,22 +134,45 @@ export default function CartPage({ cart, onNavigate, onQtyChange, onRemove, onOr
     return subtotal + (subtotal > 200 ? 0 : 19.90);
   }, [cart]);
 
+  const buscarCep = async (cepValue = dadosCliente.cep) => {
+    const cepDigits = (cepValue || '').replace(/\D/g, '');
+    if (cepDigits.length !== 8) {
+      setError('Digite um CEP válido com 8 números.');
+      return;
+    }
+    try {
+      setCepLoading(true);
+      setError('');
+      const res = await fetch(`${API}/cep/${cepDigits}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'CEP não encontrado.');
+      setDadosCliente((prev) => ({
+        ...prev,
+        cep: data.cep || prev.cep,
+        rua: data.logradouro || prev.rua,
+        bairro: data.bairro || prev.bairro,
+        cidade: data.localidade || prev.cidade,
+        uf: (data.uf || prev.uf || '').toUpperCase(),
+      }));
+      setUltimoCepBuscado(cepDigits);
+    } catch (err) {
+      setError(err.message || 'Não foi possível consultar o CEP.');
+    } finally {
+      setCepLoading(false);
+    }
+  };
+
   const updateCliente = async (field, value) => {
     if (field === 'buscarCep') {
-      const cepDigits = (dadosCliente.cep || '').replace(/\D/g, '');
-      if (cepDigits.length !== 8) {
-        setError('Digite um CEP válido com 8 números.');
-        return;
-      }
-      try {
-        setError('');
-        const res = await fetch(`${API}/cep/${cepDigits}`);
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'CEP não encontrado.');
-        const endereco = [data.logradouro, data.bairro, `${data.localidade} - ${data.uf}`].filter(Boolean).join(', ');
-        setDadosCliente((prev) => ({ ...prev, endereco, cep: data.cep || prev.cep }));
-      } catch (err) {
-        setError(err.message || 'Não foi possível consultar o CEP.');
+      await buscarCep();
+      return;
+    }
+    if (field === 'cep') {
+      const cepMask = value.replace(/\D/g, '').slice(0, 8).replace(/^(\d{5})(\d{1,3})$/, '$1-$2');
+      setDadosCliente((prev) => ({ ...prev, cep: cepMask }));
+      const digits = cepMask.replace(/\D/g, '');
+      if (digits.length === 8 && digits !== ultimoCepBuscado) {
+        await buscarCep(cepMask);
       }
       return;
     }
@@ -146,19 +187,37 @@ export default function CartPage({ cart, onNavigate, onQtyChange, onRemove, onOr
       return;
     }
 
-    if (!dadosCliente.nome || !dadosCliente.email || !dadosCliente.telefone || !dadosCliente.cep || !dadosCliente.endereco) {
+    if (
+      !dadosCliente.nome ||
+      !dadosCliente.email ||
+      !dadosCliente.telefone ||
+      !dadosCliente.cep ||
+      !dadosCliente.rua ||
+      !dadosCliente.bairro ||
+      !dadosCliente.numero ||
+      !dadosCliente.cidade ||
+      !dadosCliente.uf
+    ) {
       setError('Preencha todos os dados para finalizar o pedido.');
       return;
     }
 
     setLoading(true);
     try {
+      const enderecoEntrega = [
+        `${dadosCliente.rua}, ${dadosCliente.numero}`,
+        dadosCliente.complemento ? `Complemento: ${dadosCliente.complemento}` : '',
+        dadosCliente.bairro,
+        `${dadosCliente.cidade} - ${dadosCliente.uf}`,
+        `CEP: ${dadosCliente.cep}`,
+      ].filter(Boolean).join(' | ');
+
       const payload = {
         clienteId: cliente.id,
         clienteNome: dadosCliente.nome,
         clienteEmail: dadosCliente.email,
         clienteTelefone: dadosCliente.telefone,
-        enderecoEntrega: dadosCliente.endereco,
+        enderecoEntrega,
         metodoPagamento: 'DINHEIRO_NA_ENTREGA',
         total,
       };
@@ -229,6 +288,7 @@ export default function CartPage({ cart, onNavigate, onQtyChange, onRemove, onOr
               error={error}
               clienteLogado={Boolean(cliente?.id)}
               onNavigate={onNavigate}
+              cepLoading={cepLoading}
             />
           </div>
         )}

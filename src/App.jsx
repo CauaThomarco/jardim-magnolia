@@ -11,8 +11,9 @@ import PresentesPage from './pages/PresentesPage.jsx';
 import InstitutionalPage from './pages/InstitutionalPage.jsx';
 import TipsPage from './pages/TipsPage.jsx';
 import AddressLookupPage from './pages/AddressLookupPage.jsx';
+import ClientePage from './pages/ClientePage.jsx';
 
-const FOOTER_PAGES = new Set(['minha-conta', 'ajuda', 'politica-privacidade', 'politica-cookies', 'termos']);
+const FOOTER_PAGES = new Set(['ajuda', 'politica-privacidade', 'politica-cookies', 'termos']);
 
 export default function App() {
   const [page, setPage] = useState('home');
@@ -103,6 +104,7 @@ export default function App() {
       {page === 'presentes' && <PresentesPage onNavigate={navigate} onAddToCart={addToCart} initialCategoria={pageParams.categoria} />}
       {page === 'dicas' && <TipsPage onNavigate={navigate} />}
       {page === 'address' && <AddressLookupPage onNavigate={navigate} />}
+      {page === 'minha-conta' && <ClientePage onNavigate={navigate} cliente={cliente} onLogout={handleLogout} />}
       {FOOTER_PAGES.has(page) && <InstitutionalPage page={page} onNavigate={navigate} cliente={cliente} />}
     </div>
   );

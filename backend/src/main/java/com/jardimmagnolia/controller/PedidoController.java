@@ -39,6 +39,15 @@ public class PedidoController {
         return repo.findByStatus(status);
     }
 
+    @GetMapping("/cliente/{clienteId}")
+    public ResponseEntity<?> listarPorCliente(@PathVariable Long clienteId) {
+        if (!clienteRepository.existsById(clienteId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Cliente não encontrado."));
+        }
+        return ResponseEntity.ok(repo.findByClienteIdOrderByCriadoEmDesc(clienteId));
+    }
+
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody Pedido pedido) {
         if (pedido.getClienteId() == null || !clienteRepository.existsById(pedido.getClienteId())) {
@@ -62,6 +71,34 @@ public class PedidoController {
             p.setStatus(StatusPedido.valueOf(body.get("status").toUpperCase()));
             return ResponseEntity.ok(repo.save(p));
         }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/devolucao")
+    public ResponseEntity<?> solicitarDevolucao(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body) {
+
+        Long clienteId;
+        try {
+            clienteId = Long.parseLong(body.getOrDefault("clienteId", "0"));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Cliente inválido."));
+        }
+
+        return repo.findById(id).map(pedido -> {
+            if (!pedido.getClienteId().equals(clienteId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "Este pedido não pertence ao cliente informado."));
+            }
+            if (pedido.getStatus() == StatusPedido.CANCELADO) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "Este pedido já está cancelado."));
+            }
+            pedido.setStatus(StatusPedido.CANCELADO);
+            repo.save(pedido);
+            return ResponseEntity.ok(Map.of("message", "Solicitação de devolução registrada."));
+        }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message", "Pedido não encontrado.")));
     }
 
     @PostMapping("/cart/add")

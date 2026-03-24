@@ -2,6 +2,7 @@ package com.jardimmagnolia.controller;
 
 import com.jardimmagnolia.model.Cliente;
 import com.jardimmagnolia.repository.ClienteRepository;
+import com.jardimmagnolia.repository.PedidoRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +22,11 @@ public class AuthController {
     private String adminCode;
 
     private final ClienteRepository clienteRepository;
+    private final PedidoRepository pedidoRepository;
 
-    public AuthController(ClienteRepository clienteRepository) {
+    public AuthController(ClienteRepository clienteRepository, PedidoRepository pedidoRepository) {
         this.clienteRepository = clienteRepository;
+        this.pedidoRepository = pedidoRepository;
     }
 
     // Login do administrador por código
@@ -93,6 +96,17 @@ public class AuthController {
                     ));
                 })
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Credenciais inválidas.")));
+    }
+
+    @DeleteMapping("/clientes/{clienteId}")
+    public ResponseEntity<?> excluirConta(@PathVariable Long clienteId) {
+        if (!clienteRepository.existsById(clienteId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Cliente não encontrado."));
+        }
+
+        pedidoRepository.deleteByClienteId(clienteId);
+        clienteRepository.deleteById(clienteId);
+        return ResponseEntity.ok(Map.of("message", "Conta excluída com sucesso."));
     }
 
     private String value(String raw) {

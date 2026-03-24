@@ -2715,3 +2715,44 @@ img { max-width: 100%; display: block; }
   background: var(--green-700);
   color: var(--white);
 }
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-field__input {
+  padding-right: 44px;
+}
+
+.password-field__toggle {
+  position: absolute;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 18px;
+}
+
+.review-form {
+  margin: 14px 0 18px;
+  display: grid;
+  gap: 10px;
+  background: #f9f6ef;
+  border: 1px solid #e9dfca;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.review-form__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.review-form select,
+.review-form textarea {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+}

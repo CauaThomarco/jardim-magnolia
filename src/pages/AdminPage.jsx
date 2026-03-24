@@ -498,6 +498,74 @@ function TabProdutos() {
   );
 }
 
+function TabAvaliacoes() {
+  const [avaliacoes, setAvaliacoes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const carregar = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API}/admin/avaliacoes`);
+      if (!res.ok) throw new Error('Erro ao buscar avaliações');
+      const data = await res.json();
+      setAvaliacoes(Array.isArray(data) ? data : []);
+    } catch {
+      setAvaliacoes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { carregar(); }, []);
+
+  const atualizarStatus = async (id, status) => {
+    const res = await fetch(`${API}/admin/avaliacoes/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    if (!res.ok) return;
+
+    setAvaliacoes((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
+  };
+
+  if (loading) return <p style={{ color: 'var(--gray-500)' }}>Carregando avaliações...</p>;
+
+  return (
+    <div className="adm-table-wrap">
+      <table className="adm-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Produto</th>
+            <th>Nota</th>
+            <th>Comentário</th>
+            <th>Status</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {avaliacoes.map((a) => (
+            <tr key={a.id}>
+              <td>{a.clienteNome}</td>
+              <td>{a.produtoNome || '—'}</td>
+              <td>{a.nota}★</td>
+              <td style={{ maxWidth: 320 }}>{a.comentario}</td>
+              <td>{a.status}</td>
+              <td>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button className="adm-btn-sm adm-btn-green" onClick={() => atualizarStatus(a.id, 'APROVADA')}>Aprovar</button>
+                  <button className="adm-btn-sm adm-btn-danger" onClick={() => atualizarStatus(a.id, 'REJEITADA')}>Rejeitar</button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 // ─── LOGIN ADMIN ──────────────────────────────────────────────────────────────
 function AdminLogin({ onLogin }) {
   const [code,    setCode]    = useState('');
@@ -554,6 +622,7 @@ const TABS = [
   { id: 'pedidos',   label: '📦 Pedidos'   },
   { id: 'entregas',  label: '🚚 Entregas'  },
   { id: 'produtos',  label: '🌹 Produtos'  },
+  { id: 'avaliacoes', label: '⭐ Avaliações' },
 ];
 
 export default function AdminPage({ onNavigate }) {
@@ -600,6 +669,7 @@ export default function AdminPage({ onNavigate }) {
           {tab === 'pedidos'   && <TabPedidos   />}
           {tab === 'entregas'  && <TabEntregas  />}
           {tab === 'produtos'  && <TabProdutos  />}
+          {tab === 'avaliacoes' && <TabAvaliacoes />}
         </div>
       </main>
     </div>

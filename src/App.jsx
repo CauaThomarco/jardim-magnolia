@@ -57,8 +57,8 @@ export default function App() {
         onSearchChange={setSearchTerm}
       />
 
-      {page === 'home'      && <HomePage      onNavigate={navigate} onAddToCart={addToCart} searchTerm={searchTerm} />}
-      {page === 'product'   && <ProductPage   onNavigate={navigate} onAddToCart={addToCart} />}
+      {page === 'home'      && <HomePage      onNavigate={navigate} onAddToCart={addToCart} searchTerm={searchTerm} cliente={cliente} />}
+      {page === 'product'   && <ProductPage   onNavigate={navigate} onAddToCart={addToCart} cliente={cliente} />}
       {page === 'login'     && <LoginPage     onNavigate={navigate} onLoginCliente={setCliente} />}
       {page === 'cadastro'  && <CadastroPage  onNavigate={navigate} onCadastroRealizado={setCliente} />}
       {page === 'contact'   && <ContactPage   onNavigate={navigate} />}

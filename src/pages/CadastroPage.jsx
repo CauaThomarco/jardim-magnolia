@@ -2,11 +2,32 @@ import { useState } from 'react';
 import Footer from '../components/Footer.jsx';
 import { API } from '../hooks/useProdutos.js';
 
+function PasswordField({ value, onChange, placeholder, visible, onToggle }) {
+  return (
+    <div className="password-field">
+      <input
+        type={visible ? 'text' : 'password'}
+        className="form-input password-field__input"
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        required
+        minLength={6}
+      />
+      <button type="button" className="password-field__toggle" onClick={onToggle}>
+        {visible ? '🙈' : '👁️'}
+      </button>
+    </div>
+  );
+}
+
 export default function CadastroPage({ onNavigate, onCadastroRealizado }) {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmacao, setConfirmacao] = useState('');
+  const [showSenha, setShowSenha] = useState(false);
+  const [showConfirmacao, setShowConfirmacao] = useState(false);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState('');
   const [erro, setErro] = useState('');
@@ -28,14 +49,17 @@ export default function CadastroPage({ onNavigate, onCadastroRealizado }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nome, email, senha }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || 'Não foi possível cadastrar.');
 
       setMsg('Cadastro realizado com sucesso!');
       onCadastroRealizado?.(data);
       setTimeout(() => onNavigate('home'), 900);
     } catch (err) {
-      setErro(err.message || 'Erro inesperado no cadastro.');
+      const message = err?.message === 'Failed to fetch'
+        ? 'Não foi possível conectar ao servidor. Verifique se o backend está rodando e liberado para este domínio.'
+        : (err.message || 'Erro inesperado no cadastro.');
+      setErro(message);
     } finally {
       setLoading(false);
     }
@@ -51,8 +75,22 @@ export default function CadastroPage({ onNavigate, onCadastroRealizado }) {
           <form onSubmit={handleSubmit}>
             <input className="form-input" placeholder="Nome completo" value={nome} onChange={(e) => setNome(e.target.value)} required />
             <input type="email" className="form-input" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            <input type="password" className="form-input" placeholder="Senha" value={senha} onChange={(e) => setSenha(e.target.value)} required minLength={6} />
-            <input type="password" className="form-input" placeholder="Confirmar senha" value={confirmacao} onChange={(e) => setConfirmacao(e.target.value)} required minLength={6} />
+
+            <PasswordField
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              placeholder="Senha"
+              visible={showSenha}
+              onToggle={() => setShowSenha((prev) => !prev)}
+            />
+            <PasswordField
+              value={confirmacao}
+              onChange={(e) => setConfirmacao(e.target.value)}
+              placeholder="Confirmar senha"
+              visible={showConfirmacao}
+              onToggle={() => setShowConfirmacao((prev) => !prev)}
+            />
+
             <button type="submit" className="btn-login" disabled={loading}>{loading ? 'Cadastrando...' : 'Cadastrar'}</button>
           </form>
 

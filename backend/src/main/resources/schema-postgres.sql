@@ -37,6 +37,7 @@ CREATE TYPE status_pedido AS ENUM (
 
 CREATE TABLE IF NOT EXISTS pedido (
     id                 BIGSERIAL     PRIMARY KEY,
+    cliente_id         BIGINT        NOT NULL REFERENCES cliente(id),
     cliente_nome       VARCHAR(255)  NOT NULL,
     cliente_email      VARCHAR(255),
     cliente_telefone   VARCHAR(20),
@@ -80,3 +81,17 @@ INSERT INTO produto (nome, descricao, preco, estoque, ativo) VALUES
      'Luxuoso buquê com 30 rosas colombianas selecionadas.',
      349.90, 5,  true)
 ON CONFLICT DO NOTHING;
+
+-- ─── Avaliação ───────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS avaliacao (
+    id            BIGSERIAL PRIMARY KEY,
+    cliente_id    BIGINT NOT NULL REFERENCES cliente(id),
+    cliente_nome  VARCHAR(255) NOT NULL,
+    comentario    TEXT NOT NULL,
+    nota          INTEGER NOT NULL CHECK (nota BETWEEN 1 AND 5),
+    produto_nome  VARCHAR(255),
+    status        VARCHAR(20) NOT NULL DEFAULT 'PENDENTE',
+    criado_em     TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_avaliacao_status ON avaliacao(status);

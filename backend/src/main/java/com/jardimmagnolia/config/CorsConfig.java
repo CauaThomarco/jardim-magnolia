@@ -9,14 +9,9 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins(
-                    "http://localhost:5173",   // Vite dev server
-                    "http://localhost:3000",   // Create React App
-                    "http://localhost:4173"    // Vite preview
-                )
+                .allowedOriginPatterns("*")
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
+                .allowedHeaders("*");
     }
 
     // Serve arquivos estáticos (imagens de produtos) em /uploads/**

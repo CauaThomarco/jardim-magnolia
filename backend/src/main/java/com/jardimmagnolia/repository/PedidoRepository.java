@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
@@ -26,4 +27,6 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     BigDecimal totalVendasDesde(@Param("inicio") LocalDateTime inicio);
 
     long countByStatus(StatusPedido status);
+
+    boolean existsByClienteIdAndStatusNot(Long clienteId, StatusPedido status);
 }

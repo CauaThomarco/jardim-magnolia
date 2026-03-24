@@ -13,7 +13,7 @@ export default function NavBar({ currentPage, onNavigate, cartCount, searchTerm,
       <div className="navbar__inner">
         <div className="navbar__top">
           <div className="navbar__logo" onClick={() => onNavigate('home')}>
-            <div className="navbar__logo-circle">
+            <div className="navbar__logo-frame">
               <img
                 src="/src/assets/images/logo.png"
                 alt="Jardim Magnólia"
@@ -23,11 +23,6 @@ export default function NavBar({ currentPage, onNavigate, cartCount, searchTerm,
                 }}
               />
               <span style={{ display: 'none', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🌿</span>
-            </div>
-            <div className="navbar__logo-text">
-              <div className="navbar__logo-name">Jardim</div>
-              <div className="navbar__logo-name">Magnólia</div>
-              <div className="navbar__logo-sub">Floricultura Autoral</div>
             </div>
           </div>
 
@@ -60,7 +55,7 @@ export default function NavBar({ currentPage, onNavigate, cartCount, searchTerm,
               {cartCount > 0 && <span className="navbar__cart-badge">{cartCount}</span>}
             </div>
 
-            <div className="navbar__user" onClick={() => !cliente && onNavigate('login')}>
+            <div className="navbar__user" onClick={() => onNavigate(cliente ? 'minha-conta' : 'login')}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B3A2D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                 <circle cx="12" cy="7" r="4"/>

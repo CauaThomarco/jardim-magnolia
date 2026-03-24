@@ -18,6 +18,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByStatus(StatusPedido status);
 
     List<Pedido> findAllByOrderByCriadoEmDesc();
+    List<Pedido> findByClienteIdOrderByCriadoEmDesc(Long clienteId);
 
     @Query("SELECT p FROM Pedido p WHERE p.criadoEm >= :inicio AND p.criadoEm <= :fim ORDER BY p.criadoEm DESC")
     List<Pedido> findPedidosDoMes(@Param("inicio") LocalDateTime inicio,
@@ -29,4 +30,6 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     long countByStatus(StatusPedido status);
 
     boolean existsByClienteIdAndStatusNot(Long clienteId, StatusPedido status);
+
+    void deleteByClienteId(Long clienteId);
 }

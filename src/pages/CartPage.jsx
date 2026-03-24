@@ -46,6 +46,10 @@ function CheckoutForm({ cliente, onChange }) {
       <input className="form-input" placeholder="Nome completo" value={cliente.nome} onChange={(e) => onChange('nome', e.target.value)} required />
       <input className="form-input" type="email" placeholder="E-mail" value={cliente.email} onChange={(e) => onChange('email', e.target.value)} required />
       <input className="form-input" placeholder="Telefone" value={cliente.telefone} onChange={(e) => onChange('telefone', e.target.value)} required />
+      <div style={{ display: 'flex', gap: 8 }}>
+        <input className="form-input" placeholder="CEP" value={cliente.cep || ''} onChange={(e) => onChange('cep', e.target.value)} required style={{ marginBottom: 0 }} />
+        <button type="button" className="btn-register" style={{ marginTop: 0, whiteSpace: 'nowrap' }} onClick={() => onChange('buscarCep')}>Buscar CEP</button>
+      </div>
       <input className="form-input" placeholder="Endereço de entrega" value={cliente.endereco} onChange={(e) => onChange('endereco', e.target.value)} required />
       <div className="cart-summary__tag" style={{ marginTop: 2 }}>
         Pagamento: <strong>Dinheiro na hora da entrega</strong>
@@ -103,6 +107,7 @@ export default function CartPage({ cart, onNavigate, onQtyChange, onRemove, onOr
     nome: cliente?.nome || '',
     email: cliente?.email || '',
     telefone: '',
+    cep: '',
     endereco: '',
   });
 
@@ -111,7 +116,27 @@ export default function CartPage({ cart, onNavigate, onQtyChange, onRemove, onOr
     return subtotal + (subtotal > 200 ? 0 : 19.90);
   }, [cart]);
 
-  const updateCliente = (field, value) => setDadosCliente((prev) => ({ ...prev, [field]: value }));
+  const updateCliente = async (field, value) => {
+    if (field === 'buscarCep') {
+      const cepDigits = (dadosCliente.cep || '').replace(/\D/g, '');
+      if (cepDigits.length !== 8) {
+        setError('Digite um CEP válido com 8 números.');
+        return;
+      }
+      try {
+        setError('');
+        const res = await fetch(`${API}/cep/${cepDigits}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'CEP não encontrado.');
+        const endereco = [data.logradouro, data.bairro, `${data.localidade} - ${data.uf}`].filter(Boolean).join(', ');
+        setDadosCliente((prev) => ({ ...prev, endereco, cep: data.cep || prev.cep }));
+      } catch (err) {
+        setError(err.message || 'Não foi possível consultar o CEP.');
+      }
+      return;
+    }
+    setDadosCliente((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleCheckout = async () => {
     setError('');
@@ -121,7 +146,7 @@ export default function CartPage({ cart, onNavigate, onQtyChange, onRemove, onOr
       return;
     }
 
-    if (!dadosCliente.nome || !dadosCliente.email || !dadosCliente.telefone || !dadosCliente.endereco) {
+    if (!dadosCliente.nome || !dadosCliente.email || !dadosCliente.telefone || !dadosCliente.cep || !dadosCliente.endereco) {
       setError('Preencha todos os dados para finalizar o pedido.');
       return;
     }

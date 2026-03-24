@@ -2756,3 +2756,77 @@ img { max-width: 100%; display: block; }
   padding: 8px 10px;
   font-size: 14px;
 }
+
+.navbar__logout-btn {
+  margin-left: 8px;
+  border: 1px solid rgba(27, 58, 45, 0.35);
+  background: transparent;
+  color: var(--green-800);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 11px;
+}
+
+.password-field__toggle {
+  color: #53715f;
+  display: grid;
+  place-items: center;
+}
+
+.institutional-page {
+  min-height: 62vh;
+  padding-top: 36px;
+  padding-bottom: 44px;
+}
+
+.institutional-page h1 {
+  color: var(--green-800);
+  font-family: var(--font-serif);
+  margin-bottom: 10px;
+}
+
+.institutional-page__welcome {
+  color: var(--gray-500);
+  margin-bottom: 18px;
+}
+
+.institutional-page__section {
+  background: #fff;
+  border: 1px solid #e6dfcc;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.institutional-page__section h2 {
+  color: var(--green-800);
+  margin-bottom: 4px;
+  font-size: 18px;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.tips-card {
+  background: #fff;
+  border: 1px solid #e6dfcc;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.tips-card h3 {
+  color: var(--green-800);
+  margin-bottom: 4px;
+}
+
+.cep-form {
+  max-width: 420px;
+}
+
+.cep-error {
+  margin-top: 8px;
+  color: #9f1239;
+}

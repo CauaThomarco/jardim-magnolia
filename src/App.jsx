@@ -1,20 +1,36 @@
-import { useState } from 'react';
-import NavBar        from './components/NavBar.jsx';
-import HomePage      from './pages/HomePage.jsx';
-import ProductPage   from './pages/ProductPage.jsx';
-import LoginPage     from './pages/LoginPage.jsx';
-import CadastroPage  from './pages/CadastroPage.jsx';
-import ContactPage   from './pages/ContactPage.jsx';
-import CartPage      from './pages/CartPage.jsx';
-import AdminPage     from './pages/AdminPage.jsx';
+import { useEffect, useState } from 'react';
+import NavBar from './components/NavBar.jsx';
+import HomePage from './pages/HomePage.jsx';
+import ProductPage from './pages/ProductPage.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import CadastroPage from './pages/CadastroPage.jsx';
+import ContactPage from './pages/ContactPage.jsx';
+import CartPage from './pages/CartPage.jsx';
+import AdminPage from './pages/AdminPage.jsx';
 import PresentesPage from './pages/PresentesPage.jsx';
+import InstitutionalPage from './pages/InstitutionalPage.jsx';
+import TipsPage from './pages/TipsPage.jsx';
+import AddressLookupPage from './pages/AddressLookupPage.jsx';
+
+const FOOTER_PAGES = new Set(['minha-conta', 'ajuda', 'politica-privacidade', 'politica-cookies', 'termos']);
 
 export default function App() {
-  const [page,           setPage]           = useState('home');
-  const [pageParams,     setPageParams]     = useState({});
-  const [cart,           setCart]           = useState([]);
-  const [searchTerm,     setSearchTerm]     = useState('');
-  const [cliente,        setCliente]        = useState(null);
+  const [page, setPage] = useState('home');
+  const [pageParams, setPageParams] = useState({});
+  const [cart, setCart] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [cliente, setCliente] = useState(null);
+
+  useEffect(() => {
+    const raw = window.localStorage.getItem('jm_cliente');
+    if (raw) {
+      try {
+        setCliente(JSON.parse(raw));
+      } catch {
+        window.localStorage.removeItem('jm_cliente');
+      }
+    }
+  }, []);
 
   const cartCount = cart.reduce((acc, i) => acc + i.qty, 0);
 
@@ -24,6 +40,17 @@ export default function App() {
       if (exists) return prev.map((i) => i.id === item.id ? { ...i, qty: i.qty + (item.qty ?? 1) } : i);
       return [...prev, { ...item, qty: item.qty ?? 1 }];
     });
+  };
+
+  const handleLoginCliente = (data) => {
+    setCliente(data);
+    window.localStorage.setItem('jm_cliente', JSON.stringify(data));
+  };
+
+  const handleLogout = () => {
+    setCliente(null);
+    window.localStorage.removeItem('jm_cliente');
+    setPage('home');
   };
 
   const clearCart = () => setCart([]);
@@ -36,7 +63,6 @@ export default function App() {
 
   const removeItem = (id) => setCart((prev) => prev.filter((i) => i.id !== id));
 
-  // navigate aceita params opcionais: navigate('presentes', { categoria: 'ROSAS' })
   const navigate = (target, params = {}) => {
     setPage(target);
     setPageParams(params);
@@ -55,14 +81,16 @@ export default function App() {
         cartCount={cartCount}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
+        cliente={cliente}
+        onLogout={handleLogout}
       />
 
-      {page === 'home'      && <HomePage      onNavigate={navigate} onAddToCart={addToCart} searchTerm={searchTerm} cliente={cliente} />}
-      {page === 'product'   && <ProductPage   onNavigate={navigate} onAddToCart={addToCart} cliente={cliente} />}
-      {page === 'login'     && <LoginPage     onNavigate={navigate} onLoginCliente={setCliente} />}
-      {page === 'cadastro'  && <CadastroPage  onNavigate={navigate} onCadastroRealizado={setCliente} />}
-      {page === 'contact'   && <ContactPage   onNavigate={navigate} />}
-      {page === 'cart'      && (
+      {page === 'home' && <HomePage onNavigate={navigate} onAddToCart={addToCart} searchTerm={searchTerm} cliente={cliente} />}
+      {page === 'product' && <ProductPage onNavigate={navigate} onAddToCart={addToCart} cliente={cliente} />}
+      {page === 'login' && <LoginPage onNavigate={navigate} onLoginCliente={handleLoginCliente} />}
+      {page === 'cadastro' && <CadastroPage onNavigate={navigate} onCadastroRealizado={handleLoginCliente} />}
+      {page === 'contact' && <ContactPage onNavigate={navigate} />}
+      {page === 'cart' && (
         <CartPage
           cart={cart}
           onNavigate={navigate}
@@ -73,6 +101,9 @@ export default function App() {
         />
       )}
       {page === 'presentes' && <PresentesPage onNavigate={navigate} onAddToCart={addToCart} initialCategoria={pageParams.categoria} />}
+      {page === 'dicas' && <TipsPage onNavigate={navigate} />}
+      {page === 'address' && <AddressLookupPage onNavigate={navigate} />}
+      {FOOTER_PAGES.has(page) && <InstitutionalPage page={page} onNavigate={navigate} cliente={cliente} />}
     </div>
   );
 }

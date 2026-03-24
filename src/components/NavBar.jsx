@@ -1,17 +1,17 @@
-export default function NavBar({ currentPage, onNavigate, cartCount, searchTerm, onSearchChange }) {
+export default function NavBar({ currentPage, onNavigate, cartCount, searchTerm, onSearchChange, cliente, onLogout }) {
   const navLinks = [
-    'Buquês', 'Arranjos', 'Flores em Vasos',
-    'Ocasiões', 'Presentes', 'Dicas para Cuidado',
+    { label: 'Buquês', page: 'home' },
+    { label: 'Arranjos', page: 'home' },
+    { label: 'Flores em Vasos', page: 'home' },
+    { label: 'Ocasiões', page: 'presentes' },
+    { label: 'Presentes', page: 'presentes' },
+    { label: 'Dicas para Cuidado', page: 'dicas' },
   ];
 
   return (
     <nav className="navbar">
       <div className="navbar__inner">
-
-        {/* ── Top row ─────────────────────────────────────────────────── */}
         <div className="navbar__top">
-
-          {/* Logo */}
           <div className="navbar__logo" onClick={() => onNavigate('home')}>
             <div className="navbar__logo-circle">
               <img
@@ -22,18 +22,8 @@ export default function NavBar({ currentPage, onNavigate, cartCount, searchTerm,
                   e.currentTarget.nextSibling.style.display = 'flex';
                 }}
               />
-              <span style={{
-                display: 'none',
-                width: '100%',
-                height: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 22,
-              }}>
-                🌿
-              </span>
+              <span style={{ display: 'none', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🌿</span>
             </div>
-
             <div className="navbar__logo-text">
               <div className="navbar__logo-name">Jardim</div>
               <div className="navbar__logo-name">Magnólia</div>
@@ -41,7 +31,6 @@ export default function NavBar({ currentPage, onNavigate, cartCount, searchTerm,
             </div>
           </div>
 
-          {/* Search */}
           <div className="navbar__search">
             <input
               type="text"
@@ -53,7 +42,7 @@ export default function NavBar({ currentPage, onNavigate, cartCount, searchTerm,
             <span className="navbar__search-icon">🔍</span>
           </div>
 
-          <button className="navbar__address-btn">
+          <button className="navbar__address-btn" onClick={() => onNavigate('address')}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
               <circle cx="12" cy="10" r="3"/>
@@ -62,44 +51,43 @@ export default function NavBar({ currentPage, onNavigate, cartCount, searchTerm,
           </button>
 
           <div className="navbar__icons">
-            <div
-              className="navbar__cart"
-              onClick={() => onNavigate('cart')}
-              title="Ver carrinho"
-            >
+            <div className="navbar__cart" onClick={() => onNavigate('cart')} title="Ver carrinho">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B3A2D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="9" cy="21" r="1"/>
                 <circle cx="20" cy="21" r="1"/>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
               </svg>
-              {cartCount > 0 && (
-                <span className="navbar__cart-badge">{cartCount}</span>
-              )}
+              {cartCount > 0 && <span className="navbar__cart-badge">{cartCount}</span>}
             </div>
 
-            <div className="navbar__user" onClick={() => onNavigate('login')}>
+            <div className="navbar__user" onClick={() => !cliente && onNavigate('login')}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B3A2D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                 <circle cx="12" cy="7" r="4"/>
               </svg>
-              <span>Entrar</span>
+              {cliente ? (
+                <span>
+                  Olá, {cliente.nome?.split(' ')[0] || 'Cliente'}
+                  <button className="navbar__logout-btn" onClick={(e) => { e.stopPropagation(); onLogout?.(); }}>
+                    Sair
+                  </button>
+                </span>
+              ) : <span>Entrar</span>}
             </div>
-
           </div>
         </div>
 
         <div className="navbar__nav">
           {navLinks.map((link) => (
             <button
-              key={link}
-              className={`navbar__nav-link ${currentPage === link ? 'active' : ''}`}
-              onClick={() => onNavigate('home')}
+              key={link.label}
+              className={`navbar__nav-link ${currentPage === link.page ? 'active' : ''}`}
+              onClick={() => onNavigate(link.page)}
             >
-              {link}
+              {link.label}
             </button>
           ))}
         </div>
-
       </div>
     </nav>
   );

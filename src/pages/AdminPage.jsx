@@ -3,10 +3,7 @@ import { useProdutosAdmin, CATEGORIA_LABELS, CATEGORIA_OPTIONS, API } from '../h
 import {
   getDashboardMetrics,
   readAdminPedidos,
-  removeAdminProduto,
-  toggleAdminProduto,
   updateAdminPedidoStatus,
-  upsertAdminProduto,
   writeAdminPedidos,
 } from '../utils/adminStore.js';
 
@@ -271,7 +268,7 @@ function TabProdutos() {
       const res = await fetch(`${API}/produtos/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Erro ao remover produto');
     } catch {
-      setProdutos(removeAdminProduto(id));
+      alert('Não foi possível remover o produto no backend.');
       return;
     }
     await refetch();
@@ -283,8 +280,9 @@ function TabProdutos() {
       if (!res.ok) throw new Error('Erro ao alterar status do produto');
       await refetch();
       return;
-    } catch {}
-    setProdutos(toggleAdminProduto(id));
+    } catch {
+      alert('Não foi possível alterar status do produto no backend.');
+    }
   };
 
   const handleSave = async (e) => {
@@ -305,17 +303,7 @@ function TabProdutos() {
       if (!res.ok) throw new Error('Erro ao salvar produto');
       await refetch();
     } catch {
-      const fallbackProduto = {
-        id: editing || Date.now(),
-        name: form.nome,
-        price: Number(form.preco),
-        estoque: Number(form.estoque),
-        descricao: form.descricao,
-        categoria: form.categoria,
-        img: form.imgPreview,
-        ativo: true,
-      };
-      setProdutos(upsertAdminProduto(fallbackProduto));
+      alert('Não foi possível salvar o produto no backend.');
     } finally {
       setSaving(false);
       setShowForm(false);

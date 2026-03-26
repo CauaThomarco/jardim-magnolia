@@ -20,6 +20,15 @@ CREATE TABLE IF NOT EXISTS produto (
     criado_em   TIMESTAMP    NOT NULL DEFAULT NOW()
 );
 
+-- ─── Cliente ──────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS cliente (
+    id          BIGSERIAL    PRIMARY KEY,
+    nome        VARCHAR(255) NOT NULL,
+    email       VARCHAR(255) NOT NULL UNIQUE,
+    senha_hash  VARCHAR(255) NOT NULL,
+    criado_em   TIMESTAMP    NOT NULL DEFAULT NOW()
+);
+
 -- ─── Pedido ───────────────────────────────────────────────────
 CREATE TYPE status_pedido AS ENUM (
     'PENDENTE', 'EM_ROTA', 'ENTREGUE', 'CANCELADO'
@@ -27,10 +36,12 @@ CREATE TYPE status_pedido AS ENUM (
 
 CREATE TABLE IF NOT EXISTS pedido (
     id                 BIGSERIAL     PRIMARY KEY,
+    cliente_id         BIGINT        NOT NULL REFERENCES cliente(id),
     cliente_nome       VARCHAR(255)  NOT NULL,
     cliente_email      VARCHAR(255),
     cliente_telefone   VARCHAR(20),
     endereco_entrega   TEXT          NOT NULL,
+    metodo_pagamento   VARCHAR(80)   NOT NULL DEFAULT 'DINHEIRO_NA_ENTREGA',
     total              NUMERIC(10,2) NOT NULL,
     status             status_pedido NOT NULL DEFAULT 'PENDENTE',
     criado_em          TIMESTAMP     NOT NULL DEFAULT NOW()
@@ -69,3 +80,17 @@ INSERT INTO produto (nome, descricao, preco, estoque, ativo) VALUES
      'Luxuoso buquê com 30 rosas colombianas selecionadas.',
      349.90, 5,  true)
 ON CONFLICT DO NOTHING;
+
+-- ─── Avaliação ───────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS avaliacao (
+    id            BIGSERIAL PRIMARY KEY,
+    cliente_id    BIGINT NOT NULL REFERENCES cliente(id),
+    cliente_nome  VARCHAR(255) NOT NULL,
+    comentario    TEXT NOT NULL,
+    nota          INTEGER NOT NULL CHECK (nota BETWEEN 1 AND 5),
+    produto_nome  VARCHAR(255),
+    status        VARCHAR(20) NOT NULL DEFAULT 'PENDENTE',
+    criado_em     TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_avaliacao_status ON avaliacao(status);

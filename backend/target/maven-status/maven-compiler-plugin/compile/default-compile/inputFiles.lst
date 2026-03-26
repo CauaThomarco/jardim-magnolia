@@ -1,7 +1,9 @@
+C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\repository\ClienteRepository.java
 C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\dto\DashboardDTO.java
 C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\repository\PedidoRepository.java
 C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\CategoriaProduto.java
 C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\config\GlobalExceptionHandler.java
+C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\controller\AvaliacaoController.java
 C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\controller\DashboardController.java
 C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\Pedido.java
 C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\StatusPedido.java
@@ -9,8 +11,13 @@ C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\controll
 C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\controller\AuthController.java
 C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\JardimMagnoliaApplication.java
 C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\repository\ProdutoRepository.java
+C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\Avaliacao.java
 C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\controller\ProdutoController.java
 C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\Produto.java
 C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\controller\PedidoController.java
+C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\Cliente.java
 C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\config\CorsConfig.java
+C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\StatusAvaliacao.java
+C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\repository\AvaliacaoRepository.java
+C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\controller\CepController.java
 C:\Users\cauat\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\PedidoItem.java

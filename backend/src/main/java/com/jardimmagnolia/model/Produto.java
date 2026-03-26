@@ -38,8 +38,6 @@ public class Produto {
     @Builder.Default
     @Column(nullable = false)
     private Boolean ativo = true;
-
-    // ── CATEGORIA ────────────────────────────────────────────────────────────
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CategoriaProduto categoria = CategoriaProduto.BUQUES;

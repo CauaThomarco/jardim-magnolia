@@ -9,8 +9,6 @@ import java.util.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    // Erros de validação (@Valid)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> erros = new LinkedHashMap<>();
@@ -22,8 +20,6 @@ public class GlobalExceptionHandler {
                 "erros",  erros
         ));
     }
-
-    // Erros genéricos
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(

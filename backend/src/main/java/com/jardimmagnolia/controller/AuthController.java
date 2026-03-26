@@ -28,8 +28,6 @@ public class AuthController {
         this.clienteRepository = clienteRepository;
         this.pedidoRepository = pedidoRepository;
     }
-
-    // Login do administrador por código
     @PostMapping("/login")
     public ResponseEntity<?> loginAdmin(@RequestBody Map<String, String> payload) {
         String code = payload.get("code");
@@ -40,8 +38,6 @@ public class AuthController {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Código inválido"));
     }
-
-    // Cadastro do cliente
     @PostMapping("/clientes/register")
     public ResponseEntity<?> cadastrarCliente(@RequestBody Map<String, String> payload) {
         String nome = value(payload.get("nome"));
@@ -71,8 +67,6 @@ public class AuthController {
                 "message", "Cadastro realizado com sucesso"
         ));
     }
-
-    // Login do cliente por e-mail + senha
     @PostMapping("/clientes/login")
     public ResponseEntity<?> loginCliente(@RequestBody Map<String, String> payload) {
         String email = value(payload.get("email")).toLowerCase();

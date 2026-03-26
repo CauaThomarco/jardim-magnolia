@@ -8,22 +8,15 @@ export default function ContactPage({ onNavigate }) {
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
-
-  // Java backend: POST /api/contact  { name, email, message }
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Contact payload:', form);
-    // fetch('/api/contact', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(form),
-    // });
   };
 
   return (
     <div>
       <div className="contact-page">
-        {/* Left — photo + tagline */}
+
         <div className="contact-page__left">
           <img
             className="contact-page__left-bg"
@@ -45,7 +38,6 @@ export default function ContactPage({ onNavigate }) {
           </div>
         </div>
 
-        {/* Right — form */}
         <div className="contact-page__right">
           <form className="contact-form" onSubmit={handleSubmit}>
             <div className="form-group">

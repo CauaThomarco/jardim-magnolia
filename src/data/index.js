@@ -71,9 +71,6 @@ export const RELATED = [
     img: IMAGES.product1,
   },
 ];
-
-// Categorias da seção "Presentes Online"
-// campo: categoria usada para filtrar em PresentesPage
 export const GIFT_CATEGORIES = [
   { label: 'Datas Especiais', emoji: '🗓️', categoria: 'ANIVERSARIO' },
   { label: 'Ocasiões',        emoji: '🎉', categoria: 'PRESENTES'   },

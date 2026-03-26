@@ -42,15 +42,11 @@ export default function PresentesPage({ onNavigate, onAddToCart, initialCategori
   const [catSel,    setCatSel]    = useState(initialCategoria || 'TODOS');
   const [precoMax,  setPrecoMax]  = useState(null);
   const [busca,     setBusca]     = useState('');
-  const [ordem,     setOrdem]     = useState('nome'); // nome | preco_asc | preco_desc
+  const [ordem,     setOrdem]     = useState('nome');
   const [addedId,   setAddedId]   = useState(null);
-
-  // Agrupa todos os produtos num array único
   const todosOsProdutos = useMemo(() => {
     return Object.values(grupos).flat();
   }, [grupos]);
-
-  // Filtra e ordena
   const produtosFiltrados = useMemo(() => {
     let lista = catSel === 'TODOS'
       ? todosOsProdutos
@@ -82,7 +78,7 @@ export default function PresentesPage({ onNavigate, onAddToCart, initialCategori
 
   return (
     <div>
-      {/* Hero compact */}
+
       <div className="pres-hero">
         <div className="pres-hero__content">
           <h1 className="pres-hero__title">
@@ -96,10 +92,8 @@ export default function PresentesPage({ onNavigate, onAddToCart, initialCategori
 
       <div className="pres-layout">
 
-        {/* ── SIDEBAR DE FILTROS ─────────────────────────────────────── */}
         <aside className="pres-sidebar">
 
-          {/* Busca */}
           <div className="pres-filter__group">
             <label className="pres-filter__label">Buscar</label>
             <div className="pres-search-wrap">
@@ -115,7 +109,6 @@ export default function PresentesPage({ onNavigate, onAddToCart, initialCategori
             </div>
           </div>
 
-          {/* Categorias */}
           <div className="pres-filter__group">
             <label className="pres-filter__label">Categoria</label>
             <div className="pres-cat-list">
@@ -143,7 +136,6 @@ export default function PresentesPage({ onNavigate, onAddToCart, initialCategori
             </div>
           </div>
 
-          {/* Ocasiões */}
           <div className="pres-filter__group">
             <label className="pres-filter__label">Ocasiões</label>
             <div className="pres-ocasioes">
@@ -160,10 +152,8 @@ export default function PresentesPage({ onNavigate, onAddToCart, initialCategori
             </div>
           </div>
 
-          {/* Preço */}
           <PriceRange value={precoMax} onChange={setPrecoMax} />
 
-          {/* Limpar filtros */}
           {(catSel !== 'TODOS' || precoMax || busca) && (
             <button
               className="pres-clear-btn"
@@ -174,10 +164,8 @@ export default function PresentesPage({ onNavigate, onAddToCart, initialCategori
           )}
         </aside>
 
-        {/* ── GRID DE PRODUTOS ──────────────────────────────────────── */}
         <main className="pres-main">
 
-          {/* Header */}
           <div className="pres-main__header">
             <div>
               <h2 className="pres-main__title">
@@ -197,14 +185,12 @@ export default function PresentesPage({ onNavigate, onAddToCart, initialCategori
             </div>
           </div>
 
-          {/* Loading */}
           {loading && (
             <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--gray-500)' }}>
               <p>Carregando produtos...</p>
             </div>
           )}
 
-          {/* Empty */}
           {!loading && produtosFiltrados.length === 0 && (
             <div className="pres-empty">
               <div style={{ fontSize: 56 }}>🌸</div>
@@ -219,7 +205,6 @@ export default function PresentesPage({ onNavigate, onAddToCart, initialCategori
             </div>
           )}
 
-          {/* Grid */}
           {!loading && produtosFiltrados.length > 0 && (
             <div className="pres-grid">
               {produtosFiltrados.map((item) => (
@@ -229,7 +214,7 @@ export default function PresentesPage({ onNavigate, onAddToCart, initialCategori
                     onClick={() => onNavigate('product')}
                     onAddToCart={handleAddToCart}
                   />
-                  {/* Estoque badge */}
+
                   {item.estoque <= 5 && item.estoque > 0 && (
                     <div className="pres-stock-badge pres-stock-badge--low">
                       Últimas {item.estoque} unidades
@@ -240,7 +225,7 @@ export default function PresentesPage({ onNavigate, onAddToCart, initialCategori
                       Sem estoque
                     </div>
                   )}
-                  {/* Added to cart feedback */}
+
                   {addedId === item.id && (
                     <div className="pres-added-badge">✓ Adicionado!</div>
                   )}

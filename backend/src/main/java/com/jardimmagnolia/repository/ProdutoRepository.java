@@ -8,16 +8,8 @@ import java.util.List;
 
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
-
-    // Vitrine — apenas ativos
     List<Produto> findByAtivoTrue();
-
-    // Por categoria (vitrine)
     List<Produto> findByCategoriaAndAtivoTrue(CategoriaProduto categoria);
-
-    // Admin — todos
     List<Produto> findAllByOrderByCategoriaAscNomeAsc();
-
-    // Busca por nome
     List<Produto> findByNomeContainingIgnoreCaseAndAtivoTrue(String nome);
 }

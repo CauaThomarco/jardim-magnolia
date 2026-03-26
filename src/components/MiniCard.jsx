@@ -10,7 +10,7 @@ export default function MiniCard({ item, onClick, onAddToCart }) {
 
   return (
     <div className="card" onClick={onClick}>
-      {/* Image */}
+
       <div className="card__img">
         {imgError ? (
           <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fdf4f0', fontSize: 60 }}>
@@ -25,7 +25,6 @@ export default function MiniCard({ item, onClick, onAddToCart }) {
         )}
       </div>
 
-      {/* Body */}
       <div className="card__body">
         <div className="card__meta">
           <span className="card__source">Flores Online</span>

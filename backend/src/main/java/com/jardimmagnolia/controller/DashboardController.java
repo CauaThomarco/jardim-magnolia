@@ -19,8 +19,6 @@ public class DashboardController {
     public DashboardController(PedidoRepository pedidoRepo) {
         this.pedidoRepo = pedidoRepo;
     }
-
-    // GET /api/admin/dashboard
     @GetMapping
     public DashboardDTO getDashboard() {
         LocalDateTime inicioMes = LocalDateTime.now()

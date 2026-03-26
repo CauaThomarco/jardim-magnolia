@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
-
-// Fallback images por categoria caso o produto não tenha imagem
 const FALLBACK = {
   BUQUES:      'https://images.unsplash.com/photo-1548198471-a99ba4f98f70?w=400&q=80',
   ORQUIDEAS:   'https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=400&q=80',
@@ -13,8 +11,6 @@ const FALLBACK = {
   CESTAS:      'https://images.unsplash.com/photo-1541680760496-42f5571b7e3f?w=400&q=80',
   PLANTAS:     'https://images.unsplash.com/photo-1520412099551-62b6bafeb5bb?w=400&q=80',
 };
-
-// Normaliza produto da API para o formato usado no frontend
 function resolveImageUrl(produto) {
   const image = produto.imagemUrl || produto.img;
 
@@ -45,8 +41,6 @@ function agruparProdutos(produtos) {
     return grouped;
   }, {});
 }
-
-// Hook para buscar todos os produtos ativos, agrupados por categoria
 export function useProdutos() {
   const [grupos,  setGrupos]  = useState({});
   const [loading, setLoading] = useState(true);
@@ -72,8 +66,6 @@ export function useProdutos() {
 
   return { grupos, loading, error, refetch: fetchProdutos };
 }
-
-// Hook para buscar produtos admin (todos, inclusive inativos)
 export function useProdutosAdmin() {
   const [produtos, setProdutos] = useState([]);
   const [loading,  setLoading]  = useState(true);

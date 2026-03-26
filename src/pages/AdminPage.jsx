@@ -8,8 +8,6 @@ import {
 } from '../utils/adminStore.js';
 
 const fmt = (n = 0) => 'R$' + Number(n).toFixed(2).replace('.', ',');
-
-// ─── Status badge ─────────────────────────────────────────────────────────────
 const STATUS_MAP = {
   pendente:  { label: 'Aguardando pagamento',  color: '#856404', bg: '#fff3cd' },
   em_rota:   { label: 'Em rota',   color: '#155724', bg: '#d4edda' },
@@ -42,8 +40,6 @@ function MetricCard({ icon, label, value, sub, color = '#1B3A2D' }) {
     </div>
   );
 }
-
-// ─── DASHBOARD ────────────────────────────────────────────────────────────────
 function TabDashboard() {
   const [dash, setDash] = useState(null);
 
@@ -72,8 +68,6 @@ function TabDashboard() {
     </div>
   );
 }
-
-// ─── PEDIDOS ─────────────────────────────────────────────────────────────────
 function PedidosTable({ compact = false }) {
   const [pedidos, setPedidos] = useState([]);
   const [filter,  setFilter]  = useState('todos');
@@ -165,8 +159,6 @@ function PedidosTable({ compact = false }) {
 }
 
 function TabPedidos() { return <PedidosTable />; }
-
-// ─── ENTREGAS ─────────────────────────────────────────────────────────────────
 function TabEntregas() {
   const [pedidos, setPedidos] = useState([]);
 
@@ -232,8 +224,6 @@ function TabEntregas() {
     </div>
   );
 }
-
-// ─── PRODUTOS ────────────────────────────────────────────────────────────────
 const EMPTY = { nome: '', preco: '', estoque: '', descricao: '', categoria: 'BUQUES', imgFile: null, imgPreview: null };
 
 function TabProdutos() {
@@ -318,7 +308,7 @@ function TabProdutos() {
 
   return (
     <div>
-      {/* Header */}
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <span style={{ fontSize: 14, color: '#666' }}>{produtos.length} produtos cadastrados</span>
         <button className="adm-btn-green" onClick={() => { setShowForm(true); setEditing(null); setForm(EMPTY); }}>
@@ -326,7 +316,6 @@ function TabProdutos() {
         </button>
       </div>
 
-      {/* Filtro por categoria */}
       <div className="adm-filter-row" style={{ marginBottom: 16 }}>
         <button className={`adm-filter-btn ${filterCat === 'TODOS' ? 'active' : ''}`} onClick={() => setFilterCat('TODOS')}>Todos</button>
         {CATEGORIA_OPTIONS.map(({ value, label }) => (
@@ -336,7 +325,6 @@ function TabProdutos() {
         ))}
       </div>
 
-      {/* Modal de cadastro/edição */}
       {showForm && (
         <div className="adm-modal-bg">
           <div className="adm-modal">
@@ -346,7 +334,6 @@ function TabProdutos() {
             </div>
             <form onSubmit={handleSave} className="adm-form">
 
-              {/* Upload de imagem */}
               <div className="adm-form__img-upload">
                 {form.imgPreview
                   ? <img src={form.imgPreview} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 10 }} />
@@ -365,7 +352,6 @@ function TabProdutos() {
                   required placeholder="Ex: Buquê de Rosas Vermelhas" />
               </div>
 
-              {/* Categoria — NOVO CAMPO */}
               <div className="adm-form__group adm-form__group--full">
                 <label>Categoria *</label>
                 <select
@@ -412,7 +398,6 @@ function TabProdutos() {
         </div>
       )}
 
-      {/* Tabela */}
       {loading
         ? <p style={{ color: 'var(--gray-500)', fontSize: 14 }}>Carregando produtos...</p>
         : (
@@ -553,8 +538,6 @@ function TabAvaliacoes() {
     </div>
   );
 }
-
-// ─── LOGIN ADMIN ──────────────────────────────────────────────────────────────
 function AdminLogin({ onLogin }) {
   const [code,    setCode]    = useState('');
   const [error,   setError]   = useState('');
@@ -572,7 +555,6 @@ function AdminLogin({ onLogin }) {
       });
       if (res.ok) { onLogin(); return; }
     } catch {}
-    // Fallback offline
     if (code === 'JARDIM@2026' || code === '1011') { onLogin(); }
     else { setError('Código de acesso inválido.'); }
     setLoading(false);
@@ -603,8 +585,6 @@ function AdminLogin({ onLogin }) {
     </div>
   );
 }
-
-// ─── MAIN ─────────────────────────────────────────────────────────────────────
 const TABS = [
   { id: 'dashboard', label: '📊 Dashboard' },
   { id: 'pedidos',   label: '📦 Pedidos'   },

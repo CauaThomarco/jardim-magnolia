@@ -20,7 +20,6 @@ CREATE TABLE IF NOT EXISTS produto (
     criado_em   TIMESTAMP    NOT NULL DEFAULT NOW()
 );
 
-
 -- ─── Cliente ──────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS cliente (
     id          BIGSERIAL    PRIMARY KEY,

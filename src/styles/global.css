@@ -24,6 +24,7 @@
 
   --font-serif: 'Playfair Display', Georgia, serif;
   --font-sans:  'Inter', system-ui, sans-serif;
+  --font-title: 'Source Sans Pro', 'Inter', system-ui, sans-serif;
 
   --radius-sm:  6px;
   --radius-md:  10px;
@@ -312,10 +313,11 @@ img { max-width: 100%; display: block; }
 }
 
 .hero__title {
-  font-family: var(--font-serif);
+  font-family: var(--font-title);
   color: var(--white);
   font-size: 30px;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.2px;
   line-height: 1.25;
   margin-bottom: 10px;
 }
@@ -372,9 +374,10 @@ img { max-width: 100%; display: block; }
 }
 
 .section__title {
-  font-family: var(--font-serif);
+  font-family: var(--font-title);
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 800;
+  letter-spacing: 0.2px;
   color: var(--green-800);
 }
 
@@ -2307,9 +2310,10 @@ img { max-width: 100%; display: block; }
 .pres-hero__content { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; }
 
 .pres-hero__title {
-  font-family: var(--font-serif);
+  font-family: var(--font-title);
   font-size: 36px;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.2px;
   color: var(--white);
   margin-bottom: 8px;
   line-height: 1.2;
@@ -2696,7 +2700,9 @@ img { max-width: 100%; display: block; }
 
 .institutional-page h1 {
   color: var(--green-800);
-  font-family: var(--font-serif);
+  font-family: var(--font-title);
+  font-weight: 800;
+  letter-spacing: 0.2px;
   margin-bottom: 10px;
 }
 

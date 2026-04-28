@@ -1,7 +1,10 @@
 package com.jardimmagnolia.config;
 
+import com.jardimmagnolia.model.Avaliacao;
 import com.jardimmagnolia.model.CategoriaProduto;
 import com.jardimmagnolia.model.Produto;
+import com.jardimmagnolia.model.StatusAvaliacao;
+import com.jardimmagnolia.repository.AvaliacaoRepository;
 import com.jardimmagnolia.repository.ProdutoRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -96,6 +99,26 @@ public class DataInitializer {
         };
     }
 
+    @Bean
+    CommandLineRunner seedAvaliacoes(AvaliacaoRepository repo) {
+        return args -> {
+            if (repo.count() > 0) return;
+
+            repo.save(av(99L, "Ana Beatriz",
+                    "Fiquei encantada com a qualidade das flores! Chegaram frescas, bem embaladas e exatamente como na foto.",
+                    5, "Buquê de Rosas Vermelhas"));
+            repo.save(av(99L, "Pedro Cruz",
+                    "Flores tão lindas e o perfume tomou conta da casa. Um presente que a pessoa amou muito.",
+                    5, null));
+            repo.save(av(99L, "Mariana Julie",
+                    "Ótima experiência de compra: fácil e rápido. Flores com pétalas impecáveis.",
+                    5, "Buquê de Flores do Campo"));
+            repo.save(av(99L, "Lauro M.",
+                    "Simplesmente maravilhoso! O arranjo é ainda mais lindo pessoalmente. Entrega pontual.",
+                    5, null));
+        };
+    }
+
     private Produto p(String nome, String descricao, String preco,
                       int estoque, CategoriaProduto categoria) {
         return Produto.builder()
@@ -105,6 +128,18 @@ public class DataInitializer {
                 .estoque(estoque)
                 .ativo(true)
                 .categoria(categoria)
+                .build();
+    }
+
+    private Avaliacao av(Long clienteId, String nome, String comentario,
+                         int nota, String produtoNome) {
+        return Avaliacao.builder()
+                .clienteId(clienteId)
+                .clienteNome(nome)
+                .comentario(comentario)
+                .nota(nota)
+                .produtoNome(produtoNome)
+                .status(StatusAvaliacao.APROVADA)
                 .build();
     }
 }

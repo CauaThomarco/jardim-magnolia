@@ -19,6 +19,13 @@ export default function ClientePage({ cliente, onNavigate, onLogout }) {
   const [error, setError] = useState('');
   const [msg, setMsg] = useState('');
 
+  // Avaliação
+  const [showFormAvaliacao, setShowFormAvaliacao] = useState(false);
+  const [formAvaliacao, setFormAvaliacao] = useState({ nota: 5, comentario: '', produtoNome: '' });
+  const [salvandoAvaliacao, setSalvandoAvaliacao] = useState(false);
+  const [erroAvaliacao, setErroAvaliacao] = useState('');
+  const [avaliacaoEnviada, setAvaliacaoEnviada] = useState(false);
+
   // Endereços
   const [enderecos, setEnderecos] = useState([]);
   const [showFormEndereco, setShowFormEndereco] = useState(false);
@@ -59,6 +66,34 @@ export default function ClientePage({ cliente, onNavigate, onLogout }) {
   }, [cliente?.id]);
 
   const totalGasto = useMemo(() => pedidos.reduce((acc, p) => acc + Number(p.total || 0), 0), [pedidos]);
+  const temCompra = pedidos.some((p) => p.status !== 'CANCELADO');
+
+  const enviarAvaliacao = async (e) => {
+    e.preventDefault();
+    setSalvandoAvaliacao(true);
+    setErroAvaliacao('');
+    try {
+      const res = await fetch(`${API}/avaliacoes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clienteId: String(cliente.id),
+          nomeCliente: cliente.nome,
+          comentario: formAvaliacao.comentario,
+          produtoNome: formAvaliacao.produtoNome,
+          nota: String(formAvaliacao.nota),
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || 'Não foi possível enviar avaliação.');
+      setAvaliacaoEnviada(true);
+      setShowFormAvaliacao(false);
+    } catch (err) {
+      setErroAvaliacao(err.message || 'Erro ao enviar avaliação.');
+    } finally {
+      setSalvandoAvaliacao(false);
+    }
+  };
 
   // CEP auto-preenchimento (mesmo padrão do CartPage)
   const buscarCep = async (cepValue = formEndereco.cep) => {
@@ -406,6 +441,74 @@ export default function ClientePage({ cliente, onNavigate, onLogout }) {
             })}
           </div>
         </section>
+
+        {temCompra && (
+          <section className="institutional-page__section">
+            <h2>Deixe sua avaliação</h2>
+            <p style={{ color: '#777', fontSize: 14, marginBottom: 12 }}>
+              Sua opinião ajuda outros clientes e melhora nosso serviço.
+            </p>
+            {avaliacaoEnviada ? (
+              <p style={{ color: '#155724', fontWeight: 600, fontSize: 14 }}>
+                ✅ Avaliação enviada! Ela será publicada após aprovação.
+              </p>
+            ) : !showFormAvaliacao ? (
+              <button className="btn-register" onClick={() => setShowFormAvaliacao(true)}>
+                Avaliar compra
+              </button>
+            ) : (
+              <form onSubmit={enviarAvaliacao} style={{ display: 'grid', gap: 10, maxWidth: 480 }}>
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 600, margin: '0 0 8px' }}>Nota</p>
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <button
+                        key={n}
+                        type="button"
+                        onClick={() => setFormAvaliacao((f) => ({ ...f, nota: n }))}
+                        style={{
+                          fontSize: 28, background: 'none', border: 'none', cursor: 'pointer', padding: '0 2px',
+                          color: formAvaliacao.nota >= n ? '#f59e0b' : '#d1d5db',
+                          transition: 'color 0.15s',
+                        }}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <input
+                  className="form-input"
+                  placeholder="Nome do produto (opcional)"
+                  value={formAvaliacao.produtoNome}
+                  onChange={(e) => setFormAvaliacao((f) => ({ ...f, produtoNome: e.target.value }))}
+                />
+                <textarea
+                  className="form-input"
+                  rows={3}
+                  placeholder="Conte sua experiência..."
+                  value={formAvaliacao.comentario}
+                  onChange={(e) => setFormAvaliacao((f) => ({ ...f, comentario: e.target.value }))}
+                  required
+                  style={{ resize: 'vertical', fontFamily: 'inherit' }}
+                />
+                {erroAvaliacao && <p style={{ color: '#9f1239', fontSize: 13, margin: 0 }}>{erroAvaliacao}</p>}
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button type="submit" className="btn-login" disabled={salvandoAvaliacao}>
+                    {salvandoAvaliacao ? 'Enviando...' : 'Enviar avaliação'}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-register"
+                    onClick={() => { setShowFormAvaliacao(false); setErroAvaliacao(''); }}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            )}
+          </section>
+        )}
 
         <section className="institutional-page__section">
           <h2>Direitos do cliente</h2>

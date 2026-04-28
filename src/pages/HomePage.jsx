@@ -1,13 +1,24 @@
+import { useEffect, useState } from 'react';
 import Carousel from '../components/Carousel.jsx';
 import Stars from '../components/Stars.jsx';
 import Footer from '../components/Footer.jsx';
-import { useProdutos, CATEGORIA_LABELS } from '../hooks/useProdutos.js';
+import { useProdutos, CATEGORIA_LABELS, API } from '../hooks/useProdutos.js';
 import { HOW_TO, GIFT_CATEGORIES, IMAGES } from '../data/index.js';
 
 const CAROUSEL_ORDER = ['BUQUES', 'ORQUIDEAS', 'ANIVERSARIO', 'ROSAS', 'CAMPO', 'PRESENTES', 'CESTAS', 'PLANTAS'];
 
 export default function HomePage({ onNavigate, onAddToCart, searchTerm = '' }) {
   const { grupos, loading } = useProdutos();
+  const [avaliacoes, setAvaliacoes] = useState(HOW_TO.map((h) => ({ clienteNome: h.person, comentario: h.text, nota: 5, _date: h.date })));
+
+  useEffect(() => {
+    fetch(`${API}/avaliacoes`)
+      .then((r) => r.ok ? r.json() : [])
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setAvaliacoes(data);
+      })
+      .catch(() => {});
+  }, []);
 
   const termo = searchTerm.trim().toLowerCase();
   const gruposFiltrados = CAROUSEL_ORDER.reduce((acc, cat) => {
@@ -111,14 +122,16 @@ export default function HomePage({ onNavigate, onAddToCart, searchTerm = '' }) {
             Avaliações de clientes reais
           </p>
           <div className="reviews-grid">
-            {HOW_TO.map((h, i) => (
-              <div key={i} className="review-card">
+            {avaliacoes.slice(0, 4).map((av, i) => (
+              <div key={av.id ?? i} className="review-card">
                 <div className="review-card__stars">
-                  <Stars n={5} size={13} />
+                  <Stars n={av.nota ?? 5} size={13} />
                 </div>
-                <p className="review-card__text">{h.text}</p>
-                <div className="review-card__name">{h.person}</div>
-                <div className="review-card__date">{h.date}</div>
+                <p className="review-card__text">{av.comentario}</p>
+                <div className="review-card__name">{av.clienteNome}</div>
+                <div className="review-card__date">
+                  {av._date ?? (av.criadoEm ? new Date(av.criadoEm).toLocaleDateString('pt-BR') : '')}
+                </div>
               </div>
             ))}
           </div>

@@ -279,23 +279,75 @@ img { max-width: 100%; display: block; }
 
 .home { background: var(--cream); }
 
+/* ─── HERO / BANNER ─────────────────────────────────────────────────────── */
+
 .hero {
-  background: var(--green-800);
-  display: flex;
-  align-items: stretch;
-  min-height: 320px;
+  background: var(--cream);   /* fundo bege visível ao redor do medalhão */
   position: relative;
+  min-height: 420px;
   overflow: hidden;
 }
 
+/* Painel verde — SVG blob cobre o lado esquerdo com borda orgânica */
+.hero__panel {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  filter: drop-shadow(10px 0 28px rgba(15,35,24,0.32));
+}
+
+.hero__panel svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Medalhão da imagem — forma orgânica contida no lado direito */
+.hero__photo {
+  position: absolute;
+  right: 4%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42%;
+  height: 86%;
+  border-radius: 58% 42% 46% 54% / 52% 56% 44% 48%;
+  overflow: hidden;
+  z-index: 2;
+  box-shadow:
+    -10px 0 36px rgba(27,58,45,0.22),
+    0 24px 52px rgba(15,35,24,0.28);
+}
+
+.hero__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  filter: brightness(0.93) saturate(1.12);
+  display: block;
+}
+
+/* Véu suave na borda esquerda do medalhão — integra com o painel verde */
+.hero__photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(to right, rgba(27,58,45,0.18) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+/* Conteúdo textual — sobre o painel verde */
 .hero__content {
-  flex: 1;
-  padding: 36px 40px;
+  position: relative;
+  z-index: 3;
+  width: 52%;
+  min-height: 420px;
+  padding: 52px 44px 52px 52px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  position: relative;
-  z-index: 2;
 }
 
 .hero__tag {
@@ -350,18 +402,34 @@ img { max-width: 100%; display: block; }
 
 .hero__btn:hover { background: var(--green-600); transform: translateY(-1px); }
 
-.hero__map {
-  width: 46%;
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
+@media (max-width: 768px) {
+  .hero { min-height: 360px; }
+  .hero__photo {
+    width: 46%;
+    height: 78%;
+    right: 2%;
+  }
+  .hero__content {
+    width: 56%;
+    padding: 40px 28px 40px 32px;
+    min-height: 360px;
+  }
+  .hero__title { font-size: 24px; }
 }
 
-.hero__map img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 1;
+@media (max-width: 540px) {
+  .hero {
+    background: var(--green-800);
+    min-height: 300px;
+  }
+  .hero__panel { display: none; }
+  .hero__photo  { display: none; }
+  .hero__content {
+    width: 100%;
+    min-height: 300px;
+    padding: 36px 24px;
+    background: transparent;
+  }
 }
 
 .section { padding: 36px 0; }

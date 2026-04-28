@@ -21,6 +21,40 @@ export default function HomePage({ onNavigate, onAddToCart, searchTerm = '' }) {
   return (
     <div className="home">
       <div className="hero">
+
+        {/* ── Painel verde — SVG blob com borda orgânica ── */}
+        <div className="hero__panel" aria-hidden="true">
+          <svg
+            viewBox="0 0 1200 420"
+            preserveAspectRatio="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/*
+              Borda direita orgânica:
+              • Grande protuberância no topo (~x 785 em y≈55)
+              • Cintura no meio (~x 706 em y≈220)  ← dá o aspecto líquido
+              • Leve expansão e recuo na base (636)
+            */}
+            <path
+              d="M0,0 L635,0
+                 C678,0 785,55 770,132
+                 C755,210 706,220 718,296
+                 C730,372 676,420 636,420
+                 L0,420 Z"
+              fill="#1B3A2D"
+            />
+          </svg>
+        </div>
+
+        {/* ── Medalhão orgânico com a foto das flores ── */}
+        <div className="hero__photo" aria-hidden="true">
+          <img
+            src={IMAGES.hero}
+            alt="Flores Jardim Magnólia"
+          />
+        </div>
+
+        {/* ── Texto e CTA ── */}
         <div className="hero__content">
           <span className="hero__tag">Presentes Únicos</span>
           <h1 className="hero__title">
@@ -32,17 +66,7 @@ export default function HomePage({ onNavigate, onAddToCart, searchTerm = '' }) {
             Confira
           </button>
         </div>
-        <div className="hero__map">
-          <img
-            src={IMAGES.hero}
-            alt="Entrega de flores"
-            style={{ filter: 'brightness(0.88) saturate(1.1)' }}
-          />
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(90deg, rgba(27,58,45,0.85) 0%, rgba(27,58,45,0.0) 52%)',
-          }} />
-        </div>
+
       </div>
 
       <div className="container">

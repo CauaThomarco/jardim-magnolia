@@ -36,11 +36,11 @@ export default function HomePage({ onNavigate, onAddToCart, searchTerm = '' }) {
           <img
             src={IMAGES.hero}
             alt="Entrega de flores"
-            style={{ filter: 'brightness(0.45) saturate(0.6)' }}
+            style={{ filter: 'brightness(0.88) saturate(1.1)' }}
           />
           <div style={{
             position: 'absolute', inset: 0,
-            background: 'linear-gradient(90deg, rgba(27,58,45,0.9) 0%, rgba(27,58,45,0.1) 60%)',
+            background: 'linear-gradient(90deg, rgba(27,58,45,0.85) 0%, rgba(27,58,45,0.0) 52%)',
           }} />
         </div>
       </div>

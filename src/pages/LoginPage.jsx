@@ -65,7 +65,7 @@ export default function LoginPage({ onNavigate, onLoginCliente }) {
       }
     } catch {}
 
-    if (admin.trim() === 'JARDIM@2026' || admin.trim() === '1011') {
+    if (admin.trim() === 'JARDIM@2026') {
       onNavigate('admin');
       return;
     }

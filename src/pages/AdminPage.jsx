@@ -555,7 +555,7 @@ function AdminLogin({ onLogin }) {
       });
       if (res.ok) { onLogin(); return; }
     } catch {}
-    if (code === 'JARDIM@2026' || code === '1011') { onLogin(); }
+    if (code === 'JARDIM@2026') { onLogin(); }
     else { setError('Código de acesso inválido.'); }
     setLoading(false);
   };

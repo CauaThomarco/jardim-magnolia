@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Fragment } from 'react';
 import { useProdutosAdmin, CATEGORIA_LABELS, CATEGORIA_OPTIONS, API } from '../hooks/useProdutos.js';
 import {
   getDashboardMetrics,
@@ -538,6 +538,129 @@ function TabAvaliacoes() {
     </div>
   );
 }
+function TabClientes() {
+  const [clientes, setClientes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [senhaVisivel, setSenhaVisivel] = useState({});
+  const [expandido, setExpandido] = useState({});
+
+  useEffect(() => {
+    fetch(`${API}/auth/admin/clientes`)
+      .then((r) => {
+        if (!r.ok) throw new Error();
+        return r.json();
+      })
+      .then(setClientes)
+      .catch(() => setClientes([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const toggleSenha   = (id) => setSenhaVisivel((prev) => ({ ...prev, [id]: !prev[id] }));
+  const toggleExpand  = (id) => setExpandido((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  if (loading) return <p style={{ color: 'var(--gray-500)' }}>Carregando clientes...</p>;
+
+  return (
+    <div>
+      <div style={{ marginBottom: 16, fontSize: 14, color: '#666' }}>
+        {clientes.length} cliente(s) cadastrado(s)
+      </div>
+      <div className="adm-table-wrap">
+        <table className="adm-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Senha</th>
+              <th>Endereços</th>
+            </tr>
+          </thead>
+          <tbody>
+            {clientes.length === 0 ? (
+              <tr>
+                <td colSpan={5} style={{ textAlign: 'center', color: '#999', fontSize: 13 }}>
+                  Nenhum cliente cadastrado.
+                </td>
+              </tr>
+            ) : (
+              clientes.map((c, i) => (
+                <Fragment key={c.id}>
+                  <tr>
+                    <td><span className="adm-order-id">{i + 1}</span></td>
+                    <td style={{ fontWeight: 500 }}>{c.nome}</td>
+                    <td style={{ color: '#555', fontSize: 13 }}>{c.email}</td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontFamily: 'monospace', fontSize: 13 }}>
+                          {senhaVisivel[c.id] ? c.senha : '••••••••'}
+                        </span>
+                        <button
+                          onClick={() => toggleSenha(c.id)}
+                          style={{
+                            background: 'none', border: '1px solid #ccc', borderRadius: 6,
+                            padding: '2px 8px', cursor: 'pointer', fontSize: 11,
+                          }}
+                        >
+                          {senhaVisivel[c.id] ? 'Ocultar' : 'Ver'}
+                        </button>
+                      </div>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => toggleExpand(c.id)}
+                        style={{
+                          background: (c.enderecos?.length || 0) > 0 ? '#f0faf3' : '#f5f5f5',
+                          color: (c.enderecos?.length || 0) > 0 ? '#1B3A2D' : '#999',
+                          border: 'none', borderRadius: 20, padding: '3px 12px',
+                          fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                        }}
+                      >
+                        {c.enderecos?.length || 0} endereço(s) {expandido[c.id] ? '▲' : '▼'}
+                      </button>
+                    </td>
+                  </tr>
+                  {expandido[c.id] && (
+                    <tr style={{ background: '#fafafa' }}>
+                      <td colSpan={5} style={{ padding: '8px 20px 14px' }}>
+                        {(c.enderecos?.length || 0) === 0 ? (
+                          <p style={{ color: '#aaa', fontSize: 13, margin: 0 }}>Sem endereços cadastrados.</p>
+                        ) : (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                            {c.enderecos.map((end) => (
+                              <div key={end.id} style={{
+                                background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8,
+                                padding: '8px 14px', fontSize: 13, display: 'flex', gap: 10, alignItems: 'center',
+                              }}>
+                                {end.apelido && (
+                                  <span style={{
+                                    background: '#1B3A2D', color: '#fff', fontSize: 10, fontWeight: 700,
+                                    borderRadius: 20, padding: '2px 8px', whiteSpace: 'nowrap',
+                                  }}>
+                                    {end.apelido}
+                                  </span>
+                                )}
+                                <span>
+                                  {end.rua}, {end.numero}
+                                  {end.complemento ? ` – ${end.complemento}` : ''} · {end.bairro} · {end.cidade}/{end.uf} · CEP {end.cep}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function AdminLogin({ onLogin }) {
   const [code,    setCode]    = useState('');
   const [error,   setError]   = useState('');
@@ -591,6 +714,7 @@ const TABS = [
   { id: 'entregas',  label: '🚚 Entregas'  },
   { id: 'produtos',  label: '🌹 Produtos'  },
   { id: 'avaliacoes', label: '⭐ Avaliações' },
+  { id: 'clientes',  label: '👥 Clientes'  },
 ];
 
 export default function AdminPage({ onNavigate }) {
@@ -638,6 +762,7 @@ export default function AdminPage({ onNavigate }) {
           {tab === 'entregas'  && <TabEntregas  />}
           {tab === 'produtos'  && <TabProdutos  />}
           {tab === 'avaliacoes' && <TabAvaliacoes />}
+          {tab === 'clientes'  && <TabClientes  />}
         </div>
       </main>
     </div>

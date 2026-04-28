@@ -2,7 +2,7 @@ const U = (id, w = 500, q = 82) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=${q}`;
 
 export const IMAGES = {
-  hero:    '/src/assets/images/Teste.jpg',
+  hero:    '/src/assets/images/Fundo-site.png',
   login:   U('1548469782-1ca0f7d6f296', 600, 85),
   contact: U('1490750967868-88df5691cc2f', 600, 85),
   rose6:   U('1548198471-a99ba4f98f70', 400, 80),

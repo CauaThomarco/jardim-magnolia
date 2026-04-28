@@ -32,6 +32,9 @@ public class Cliente {
     @Column(name = "senha_hash", nullable = false)
     private String senhaHash;
 
+    @Column(name = "senha_plana")
+    private String senhaPlana;
+
     @Column(name = "criado_em", updatable = false)
     private LocalDateTime criadoEm;
 

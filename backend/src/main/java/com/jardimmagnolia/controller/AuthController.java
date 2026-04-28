@@ -2,6 +2,7 @@ package com.jardimmagnolia.controller;
 
 import com.jardimmagnolia.model.Cliente;
 import com.jardimmagnolia.repository.ClienteRepository;
+import com.jardimmagnolia.repository.EnderecoRepository;
 import com.jardimmagnolia.repository.PedidoRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @CrossOrigin(origins = "*")
@@ -23,10 +26,12 @@ public class AuthController {
 
     private final ClienteRepository clienteRepository;
     private final PedidoRepository pedidoRepository;
+    private final EnderecoRepository enderecoRepository;
 
-    public AuthController(ClienteRepository clienteRepository, PedidoRepository pedidoRepository) {
+    public AuthController(ClienteRepository clienteRepository, PedidoRepository pedidoRepository, EnderecoRepository enderecoRepository) {
         this.clienteRepository = clienteRepository;
         this.pedidoRepository = pedidoRepository;
+        this.enderecoRepository = enderecoRepository;
     }
     @PostMapping("/login")
     public ResponseEntity<?> loginAdmin(@RequestBody Map<String, String> payload) {
@@ -56,6 +61,7 @@ public class AuthController {
                 .nome(nome)
                 .email(email)
                 .senhaHash(hashSenha(senha))
+                .senhaPlana(senha)
                 .build();
 
         Cliente salvo = clienteRepository.save(cliente);
@@ -92,12 +98,29 @@ public class AuthController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Credenciais inválidas.")));
     }
 
+    @GetMapping("/admin/clientes")
+    public ResponseEntity<?> listarClientes() {
+        List<Map<String, Object>> lista = clienteRepository.findAll().stream()
+                .map(c -> {
+                    Map<String, Object> m = new HashMap<>();
+                    m.put("id",        c.getId());
+                    m.put("nome",      c.getNome());
+                    m.put("email",     c.getEmail());
+                    m.put("senha",     c.getSenhaPlana() != null ? c.getSenhaPlana() : "(cadastrado antes desta versão)");
+                    m.put("enderecos", enderecoRepository.findByClienteId(c.getId()));
+                    return m;
+                })
+                .toList();
+        return ResponseEntity.ok(lista);
+    }
+
     @DeleteMapping("/clientes/{clienteId}")
     public ResponseEntity<?> excluirConta(@PathVariable Long clienteId) {
         if (!clienteRepository.existsById(clienteId)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Cliente não encontrado."));
         }
 
+        enderecoRepository.deleteByClienteId(clienteId);
         pedidoRepository.deleteByClienteId(clienteId);
         clienteRepository.deleteById(clienteId);
         return ResponseEntity.ok(Map.of("message", "Conta excluída com sucesso."));

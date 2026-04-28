@@ -90,7 +90,7 @@ export default function App() {
       {page === 'product' && <ProductPage onNavigate={navigate} onAddToCart={addToCart} cliente={cliente} />}
       {page === 'login' && <LoginPage onNavigate={navigate} onLoginCliente={handleLoginCliente} />}
       {page === 'cadastro' && <CadastroPage onNavigate={navigate} onCadastroRealizado={handleLoginCliente} />}
-      {page === 'contact' && <ContactPage onNavigate={navigate} />}
+      {page === 'contact' && <ContactPage onNavigate={navigate} cliente={cliente} />}
       {page === 'cart' && (
         <CartPage
           cart={cart}

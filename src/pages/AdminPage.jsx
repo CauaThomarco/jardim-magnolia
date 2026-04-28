@@ -676,6 +676,135 @@ function TabClientes() {
   );
 }
 
+const STATUS_CONTATO = {
+  ABERTO:        { label: 'Aberto',        color: '#856404', bg: '#fff3cd' },
+  EM_ANDAMENTO:  { label: 'Em andamento',  color: '#004085', bg: '#cce5ff' },
+  RESOLVIDO:     { label: 'Resolvido',     color: '#155724', bg: '#d4edda' },
+};
+
+function TabSuporte() {
+  const [contatos, setContatos] = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [expandido, setExpandido] = useState({});
+
+  const carregar = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API}/admin/contatos`);
+      if (!res.ok) throw new Error();
+      setContatos(await res.json());
+    } catch {
+      setContatos([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { carregar(); }, []);
+
+  const atualizarStatus = async (id, status) => {
+    try {
+      await fetch(`${API}/admin/contatos/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      setContatos((prev) => prev.map((c) => (c.id === id ? { ...c, status } : c)));
+    } catch {}
+  };
+
+  if (loading) return <p style={{ color: 'var(--gray-500)' }}>Carregando mensagens...</p>;
+
+  const abertos = contatos.filter((c) => c.status !== 'RESOLVIDO').length;
+
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap' }}>
+        <MetricCard icon="📨" label="Total de mensagens" value={contatos.length} color="#1B3A2D" />
+        <MetricCard icon="🔔" label="Pendentes"           value={abertos}         color="#856404" />
+        <MetricCard icon="✅" label="Resolvidos"          value={contatos.length - abertos} color="#155724" />
+      </div>
+
+      {contatos.length === 0 ? (
+        <p style={{ color: 'var(--gray-500)', fontSize: 14 }}>Nenhuma mensagem de suporte recebida ainda.</p>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {contatos.map((c) => {
+            const s = STATUS_CONTATO[c.status] || STATUS_CONTATO.ABERTO;
+            const isOpen = expandido[c.id];
+            return (
+              <div
+                key={c.id}
+                style={{
+                  border: '1px solid', borderRadius: 12, overflow: 'hidden',
+                  borderColor: c.status === 'RESOLVIDO' ? '#e2e8e0' : '#d4a017',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '12px 16px',
+                    background: c.status === 'RESOLVIDO' ? '#fafaf8' : '#fffdf0',
+                    cursor: 'pointer',
+                    flexWrap: 'wrap',
+                  }}
+                  onClick={() => setExpandido((prev) => ({ ...prev, [c.id]: !prev[c.id] }))}
+                >
+                  <span style={{ background: s.bg, color: s.color, fontSize: 11, fontWeight: 700, borderRadius: 20, padding: '3px 10px', whiteSpace: 'nowrap' }}>
+                    {s.label}
+                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <strong style={{ fontSize: 14 }}>{c.nome}</strong>
+                    <span style={{ color: '#888', fontSize: 12, marginLeft: 8 }}>{c.email}</span>
+                  </div>
+                  <span style={{
+                    fontSize: 12, fontWeight: 600, color: '#1B3A2D',
+                    background: '#f0faf3', borderRadius: 20, padding: '3px 10px', whiteSpace: 'nowrap',
+                  }}>
+                    {c.assunto}
+                  </span>
+                  {c.numeroPedido && (
+                    <span style={{ fontSize: 12, color: '#777' }}>Pedido #{c.numeroPedido}</span>
+                  )}
+                  <span style={{ fontSize: 11, color: '#aaa', whiteSpace: 'nowrap' }}>
+                    {c.criadoEm ? new Date(c.criadoEm).toLocaleDateString('pt-BR') : '—'}
+                  </span>
+                  <span style={{ color: '#1B3A2D', fontSize: 16 }}>{isOpen ? '▲' : '▼'}</span>
+                </div>
+
+                {isOpen && (
+                  <div style={{ padding: '14px 16px', background: '#fff', borderTop: '1px solid #f0f0f0' }}>
+                    <p style={{ fontSize: 14, color: '#333', lineHeight: 1.7, marginBottom: 16, whiteSpace: 'pre-wrap' }}>
+                      {c.mensagem}
+                    </p>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 13, color: '#666', alignSelf: 'center', marginRight: 4 }}>Alterar status:</span>
+                      {['ABERTO', 'EM_ANDAMENTO', 'RESOLVIDO'].map((st) => (
+                        <button
+                          key={st}
+                          onClick={() => atualizarStatus(c.id, st)}
+                          style={{
+                            background: c.status === st ? STATUS_CONTATO[st].bg : '#f5f5f5',
+                            color:      c.status === st ? STATUS_CONTATO[st].color : '#555',
+                            border: 'none', borderRadius: 20, padding: '5px 14px',
+                            fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                          }}
+                        >
+                          {STATUS_CONTATO[st].label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AdminLogin({ onLogin }) {
   const [code,    setCode]    = useState('');
   const [error,   setError]   = useState('');
@@ -729,6 +858,7 @@ const TABS = [
   { id: 'entregas',  label: '🚚 Entregas'  },
   { id: 'produtos',  label: '🌹 Produtos'  },
   { id: 'avaliacoes', label: '⭐ Avaliações' },
+  { id: 'suporte',   label: '💬 Suporte'   },
   { id: 'clientes',  label: '👥 Clientes'  },
 ];
 
@@ -777,6 +907,7 @@ export default function AdminPage({ onNavigate }) {
           {tab === 'entregas'  && <TabEntregas  />}
           {tab === 'produtos'  && <TabProdutos  />}
           {tab === 'avaliacoes' && <TabAvaliacoes />}
+          {tab === 'suporte'   && <TabSuporte   />}
           {tab === 'clientes'  && <TabClientes  />}
         </div>
       </main>

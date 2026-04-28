@@ -101,6 +101,14 @@ public class PedidoController {
                 .body(Map.of("message", "Pedido não encontrado.")));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletar(@PathVariable Long id) {
+        if (!repo.existsById(id))
+            return ResponseEntity.notFound().build();
+        repo.deleteById(id);
+        return ResponseEntity.ok(Map.of("message", "Pedido removido."));
+    }
+
     @PostMapping("/cart/add")
     public ResponseEntity<?> addToCart(@RequestBody Map<String, Object> body) {
         return ResponseEntity.ok(Map.of(

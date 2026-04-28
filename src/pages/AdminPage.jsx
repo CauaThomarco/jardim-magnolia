@@ -99,6 +99,18 @@ function PedidosTable({ compact = false }) {
     setPedidos(updated);
   };
 
+  const excluirPedido = async (id) => {
+    if (!window.confirm('Remover este pedido permanentemente?')) return;
+    try {
+      const res = await fetch(`${API}/pedidos/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Erro ao excluir pedido');
+    } catch {
+      alert('Não foi possível remover o pedido.');
+      return;
+    }
+    setPedidos((prev) => prev.filter((p) => p.id !== id));
+  };
+
   const filtrados = filter === 'todos' ? pedidos : pedidos.filter((p) => p.status === filter.toUpperCase());
   const lista = compact ? filtrados.slice(0, 4) : filtrados;
 
@@ -137,16 +149,19 @@ function PedidosTable({ compact = false }) {
                 <td><StatusBadge status={p.status} /></td>
                 {!compact && (
                   <td>
-                    <select
-                      value={p.status}
-                      onChange={(e) => atualizarStatus(p.id, e.target.value)}
-                      style={{ fontSize: 12, padding: '4px 8px', borderRadius: 6, border: '1px solid #ddd', cursor: 'pointer' }}
-                    >
-                      <option value="PENDENTE">Pendente</option>
-                      <option value="EM_ROTA">Em rota</option>
-                      <option value="ENTREGUE">Entregue</option>
-                      <option value="CANCELADO">Cancelado</option>
-                    </select>
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                      <select
+                        value={p.status}
+                        onChange={(e) => atualizarStatus(p.id, e.target.value)}
+                        style={{ fontSize: 12, padding: '4px 8px', borderRadius: 6, border: '1px solid #ddd', cursor: 'pointer' }}
+                      >
+                        <option value="PENDENTE">Pendente</option>
+                        <option value="EM_ROTA">Em rota</option>
+                        <option value="ENTREGUE">Entregue</option>
+                        <option value="CANCELADO">Cancelado</option>
+                      </select>
+                      <button className="adm-btn-sm adm-btn-danger" onClick={() => excluirPedido(p.id)} title="Excluir pedido">🗑️</button>
+                    </div>
                   </td>
                 )}
               </tr>

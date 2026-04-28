@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Footer from '../components/Footer.jsx';
 import { API } from '../hooks/useProdutos.js';
 
@@ -40,28 +40,80 @@ function CartItem({ item, onQtyChange, onRemove }) {
   );
 }
 
-function CheckoutForm({ cliente, onChange, cepLoading }) {
+function CheckoutForm({ cliente, onChange, cepLoading, enderecos, enderecoSelecionado, onSelecionarEndereco }) {
+  const mostrarFormEndereco = enderecos.length === 0 || enderecoSelecionado === 'novo';
+
   return (
     <div style={{ marginTop: 16, display: 'grid', gap: 10 }}>
       <input className="form-input" placeholder="Nome completo" value={cliente.nome} onChange={(e) => onChange('nome', e.target.value)} required />
       <input className="form-input" type="email" placeholder="E-mail" value={cliente.email} onChange={(e) => onChange('email', e.target.value)} required />
       <input className="form-input" placeholder="Telefone" value={cliente.telefone} onChange={(e) => onChange('telefone', e.target.value)} required />
-      <div style={{ display: 'flex', gap: 8 }}>
-        <input className="form-input" placeholder="CEP" value={cliente.cep || ''} onChange={(e) => onChange('cep', e.target.value)} required style={{ marginBottom: 0 }} />
-        <button type="button" className="btn-register" style={{ marginTop: 0, whiteSpace: 'nowrap' }} onClick={() => onChange('buscarCep')} disabled={cepLoading}>
-          {cepLoading ? 'Buscando...' : 'Buscar CEP'}
-        </button>
-      </div>
-      <input className="form-input" placeholder="Rua / Logradouro" value={cliente.rua} onChange={(e) => onChange('rua', e.target.value)} required />
-      <input className="form-input" placeholder="Bairro" value={cliente.bairro} onChange={(e) => onChange('bairro', e.target.value)} required />
-      <div style={{ display: 'grid', gap: 8, gridTemplateColumns: '1fr 1fr' }}>
-        <input className="form-input" placeholder="Número" value={cliente.numero} onChange={(e) => onChange('numero', e.target.value)} required style={{ marginBottom: 0 }} />
-        <input className="form-input" placeholder="Complemento (opcional)" value={cliente.complemento} onChange={(e) => onChange('complemento', e.target.value)} style={{ marginBottom: 0 }} />
-      </div>
-      <div style={{ display: 'grid', gap: 8, gridTemplateColumns: '1fr 90px' }}>
-        <input className="form-input" placeholder="Cidade" value={cliente.cidade} onChange={(e) => onChange('cidade', e.target.value)} required style={{ marginBottom: 0 }} />
-        <input className="form-input" placeholder="UF" value={cliente.uf} onChange={(e) => onChange('uf', e.target.value.toUpperCase())} required maxLength={2} style={{ marginBottom: 0 }} />
-      </div>
+
+      {enderecos.length > 0 && (
+        <div>
+          <p style={{ fontSize: 13, fontWeight: 600, margin: '4px 0 8px', color: '#333' }}>Endereço de entrega</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {enderecos.map((end) => (
+              <label
+                key={end.id}
+                style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 10,
+                  padding: '10px 12px',
+                  border: `1.5px solid ${enderecoSelecionado === end.id ? '#1B3A2D' : '#ddd'}`,
+                  borderRadius: 10, cursor: 'pointer', fontSize: 13,
+                  background: enderecoSelecionado === end.id ? '#f0faf3' : '#fff',
+                }}
+              >
+                <input type="radio" name="endereco" style={{ marginTop: 2 }} checked={enderecoSelecionado === end.id} onChange={() => onSelecionarEndereco(end)} />
+                <div>
+                  {end.apelido && (
+                    <span style={{ fontWeight: 700, background: '#1B3A2D', color: '#fff', fontSize: 10, borderRadius: 20, padding: '2px 8px', marginRight: 6 }}>
+                      {end.apelido}
+                    </span>
+                  )}
+                  <span>{end.rua}, {end.numero}{end.complemento ? ` – ${end.complemento}` : ''}</span>
+                  <br />
+                  <span style={{ color: '#666' }}>{end.bairro} · {end.cidade}/{end.uf} · CEP {end.cep}</span>
+                </div>
+              </label>
+            ))}
+            <label
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '10px 12px',
+                border: `1.5px solid ${enderecoSelecionado === 'novo' ? '#1B3A2D' : '#ddd'}`,
+                borderRadius: 10, cursor: 'pointer', fontSize: 13,
+                background: enderecoSelecionado === 'novo' ? '#f0faf3' : '#fff',
+              }}
+            >
+              <input type="radio" name="endereco" checked={enderecoSelecionado === 'novo'} onChange={() => onSelecionarEndereco('novo')} />
+              + Outro endereço
+            </label>
+          </div>
+        </div>
+      )}
+
+      {mostrarFormEndereco && (
+        <>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input className="form-input" placeholder="CEP" value={cliente.cep || ''} onChange={(e) => onChange('cep', e.target.value)} required style={{ marginBottom: 0 }} />
+            <button type="button" className="btn-register" style={{ marginTop: 0, whiteSpace: 'nowrap' }} onClick={() => onChange('buscarCep')} disabled={cepLoading}>
+              {cepLoading ? 'Buscando...' : 'Buscar CEP'}
+            </button>
+          </div>
+          <input className="form-input" placeholder="Rua / Logradouro" value={cliente.rua} onChange={(e) => onChange('rua', e.target.value)} required />
+          <input className="form-input" placeholder="Bairro" value={cliente.bairro} onChange={(e) => onChange('bairro', e.target.value)} required />
+          <div style={{ display: 'grid', gap: 8, gridTemplateColumns: '1fr 1fr' }}>
+            <input className="form-input" placeholder="Número" value={cliente.numero} onChange={(e) => onChange('numero', e.target.value)} required style={{ marginBottom: 0 }} />
+            <input className="form-input" placeholder="Complemento (opcional)" value={cliente.complemento} onChange={(e) => onChange('complemento', e.target.value)} style={{ marginBottom: 0 }} />
+          </div>
+          <div style={{ display: 'grid', gap: 8, gridTemplateColumns: '1fr 90px' }}>
+            <input className="form-input" placeholder="Cidade" value={cliente.cidade} onChange={(e) => onChange('cidade', e.target.value)} required style={{ marginBottom: 0 }} />
+            <input className="form-input" placeholder="UF" value={cliente.uf} onChange={(e) => onChange('uf', e.target.value.toUpperCase())} required maxLength={2} style={{ marginBottom: 0 }} />
+          </div>
+        </>
+      )}
+
       <div className="cart-summary__tag" style={{ marginTop: 2 }}>
         Pagamento: <strong>Dinheiro na hora da entrega</strong>
       </div>
@@ -69,7 +121,7 @@ function CheckoutForm({ cliente, onChange, cepLoading }) {
   );
 }
 
-function OrderSummary({ items, cliente, onClienteChange, onCheckout, loading, error, clienteLogado, onNavigate, cepLoading }) {
+function OrderSummary({ items, cliente, onClienteChange, onCheckout, loading, error, clienteLogado, onNavigate, cepLoading, enderecos, enderecoSelecionado, onSelecionarEndereco }) {
   const subtotal = items.reduce((acc, i) => acc + i.price * i.qty, 0);
   const shipping = subtotal > 200 ? 0 : 19.90;
   const total = subtotal + shipping;
@@ -91,7 +143,7 @@ function OrderSummary({ items, cliente, onClienteChange, onCheckout, loading, er
         </div>
       )}
 
-      <CheckoutForm cliente={cliente} onChange={onClienteChange} cepLoading={cepLoading} />
+      <CheckoutForm cliente={cliente} onChange={onClienteChange} cepLoading={cepLoading} enderecos={enderecos} enderecoSelecionado={enderecoSelecionado} onSelecionarEndereco={onSelecionarEndereco} />
 
       <button className="cart-summary__checkout" onClick={() => onCheckout({ subtotal, shipping, total })} disabled={loading || !clienteLogado}>
         {loading ? 'Enviando pedido...' : 'Finalizar compra'}
@@ -116,6 +168,8 @@ export default function CartPage({ cart, onNavigate, onQtyChange, onRemove, onOr
   const [error, setError] = useState('');
   const [cepLoading, setCepLoading] = useState(false);
   const [ultimoCepBuscado, setUltimoCepBuscado] = useState('');
+  const [enderecos, setEnderecos] = useState([]);
+  const [enderecoSelecionado, setEnderecoSelecionado] = useState(null);
   const [dadosCliente, setDadosCliente] = useState({
     nome: cliente?.nome || '',
     email: cliente?.email || '',
@@ -128,6 +182,55 @@ export default function CartPage({ cart, onNavigate, onQtyChange, onRemove, onOr
     cidade: '',
     uf: '',
   });
+
+  useEffect(() => {
+    if (!cliente?.id) {
+      setEnderecoSelecionado('novo');
+      return;
+    }
+    fetch(`${API}/clientes/${cliente.id}/enderecos`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => {
+        const lista = Array.isArray(data) ? data : [];
+        setEnderecos(lista);
+        if (lista.length > 0) {
+          const primeiro = lista[0];
+          setEnderecoSelecionado(primeiro.id);
+          setDadosCliente((prev) => ({
+            ...prev,
+            cep: primeiro.cep || '',
+            rua: primeiro.rua || '',
+            bairro: primeiro.bairro || '',
+            numero: primeiro.numero || '',
+            complemento: primeiro.complemento || '',
+            cidade: primeiro.cidade || '',
+            uf: primeiro.uf || '',
+          }));
+        } else {
+          setEnderecoSelecionado('novo');
+        }
+      })
+      .catch(() => setEnderecoSelecionado('novo'));
+  }, [cliente?.id]);
+
+  const selecionarEndereco = (end) => {
+    if (end === 'novo') {
+      setEnderecoSelecionado('novo');
+      setDadosCliente((prev) => ({ ...prev, cep: '', rua: '', bairro: '', numero: '', complemento: '', cidade: '', uf: '' }));
+    } else {
+      setEnderecoSelecionado(end.id);
+      setDadosCliente((prev) => ({
+        ...prev,
+        cep: end.cep || '',
+        rua: end.rua || '',
+        bairro: end.bairro || '',
+        numero: end.numero || '',
+        complemento: end.complemento || '',
+        cidade: end.cidade || '',
+        uf: end.uf || '',
+      }));
+    }
+  };
 
   const total = useMemo(() => {
     const subtotal = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
@@ -289,6 +392,9 @@ export default function CartPage({ cart, onNavigate, onQtyChange, onRemove, onOr
               clienteLogado={Boolean(cliente?.id)}
               onNavigate={onNavigate}
               cepLoading={cepLoading}
+              enderecos={enderecos}
+              enderecoSelecionado={enderecoSelecionado}
+              onSelecionarEndereco={selecionarEndereco}
             />
           </div>
         )}

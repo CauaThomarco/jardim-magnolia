@@ -5,5 +5,6 @@ com\jardimmagnolia\model\Cliente$ClienteBuilder.class
 com\jardimmagnolia\model\Avaliacao$AvaliacaoBuilder.class
 com\jardimmagnolia\model\StatusAvaliacao.class
 com\jardimmagnolia\controller\AvaliacaoController.class
+com\jardimmagnolia\config\DataInitializer.class
 com\jardimmagnolia\model\Avaliacao.class
 com\jardimmagnolia\controller\CepController.class

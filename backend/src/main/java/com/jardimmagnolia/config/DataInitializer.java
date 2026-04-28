@@ -36,9 +36,11 @@ public class DataInitializer {
                     "Buque luxuoso com 30 rosas colombianas selecionadas.",
                     "349.90", 5, CategoriaProduto.BUQUES));
 
-            repo.save(p("Orquidea Phalaenopsis Pink Plantada Para Entrega",
+            Produto orquidea = p("Orquidea Phalaenopsis Pink Plantada Para Entrega",
                     "Orquidea phalaenopsis plantada em vaso elegante.",
-                    "179.41", 0, CategoriaProduto.ORQUIDEAS).toBuilder().ativo(false).build());
+                    "179.41", 0, CategoriaProduto.ORQUIDEAS);
+            orquidea.setAtivo(false);
+            repo.save(orquidea);
 
             repo.save(p("Arranjo de Orquideas com Bowl de Vidro Para Entrega",
                     "Arranjo sofisticado com orquideas em bowl de vidro.",

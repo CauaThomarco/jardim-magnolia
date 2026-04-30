@@ -45,6 +45,9 @@ public class Produto {
     @Column(name = "imagem_url")
     private String imagemUrl;
 
+    @Column(name = "imagens_extras", columnDefinition = "TEXT")
+    private String imagensExtras;
+
     @Column(name = "criado_em", updatable = false)
     private LocalDateTime criadoEm;
 

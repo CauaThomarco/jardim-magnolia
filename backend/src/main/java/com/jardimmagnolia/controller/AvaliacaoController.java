@@ -80,10 +80,17 @@ public class AvaliacaoController {
                 .comentario(comentario)
                 .produtoNome(produtoNome)
                 .nota(nota)
-                .status(StatusAvaliacao.PENDENTE)
+                .status(StatusAvaliacao.APROVADA)
                 .build());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(salva);
+    }
+
+    @DeleteMapping("/admin/avaliacoes/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        if (!avaliacaoRepository.existsById(id)) return ResponseEntity.notFound().build();
+        avaliacaoRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/admin/avaliacoes/{id}/status")

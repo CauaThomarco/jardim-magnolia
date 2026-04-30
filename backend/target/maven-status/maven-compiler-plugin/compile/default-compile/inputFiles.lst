@@ -6,12 +6,14 @@ C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagn
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\Produto.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\Avaliacao.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\StatusAvaliacao.java
+C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\Contato.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\controller\AvaliacaoController.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\dto\DashboardDTO.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\controller\ProdutoController.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\controller\CepController.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\repository\PedidoRepository.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\Cliente.java
+C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\controller\ContatoController.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\config\DataInitializer.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\controller\EnderecoController.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\JardimMagnoliaApplication.java
@@ -22,6 +24,8 @@ C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagn
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\controller\DashboardController.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\StatusPedido.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\Endereco.java
+C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\repository\ContatoRepository.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\PedidoItem.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\controller\ContactController.java
+C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\model\StatusContato.java
 C:\Users\cauat\IdeaProjects\jardim-magnolia\backend\src\main\java\com\jardimmagnolia\repository\ClienteRepository.java

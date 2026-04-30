@@ -2,6 +2,9 @@ com\jardimmagnolia\repository\AvaliacaoRepository.class
 com\jardimmagnolia\model\Cliente.class
 com\jardimmagnolia\repository\ClienteRepository.class
 com\jardimmagnolia\repository\EnderecoRepository.class
+com\jardimmagnolia\model\StatusContato.class
+com\jardimmagnolia\controller\ContatoController.class
+com\jardimmagnolia\model\Contato.class
 com\jardimmagnolia\model\Cliente$ClienteBuilder.class
 com\jardimmagnolia\model\Endereco.class
 com\jardimmagnolia\model\Endereco$EnderecoBuilder.class
@@ -11,4 +14,6 @@ com\jardimmagnolia\controller\EnderecoController.class
 com\jardimmagnolia\controller\AvaliacaoController.class
 com\jardimmagnolia\config\DataInitializer.class
 com\jardimmagnolia\model\Avaliacao.class
+com\jardimmagnolia\repository\ContatoRepository.class
+com\jardimmagnolia\model\Contato$ContatoBuilder.class
 com\jardimmagnolia\controller\CepController.class
